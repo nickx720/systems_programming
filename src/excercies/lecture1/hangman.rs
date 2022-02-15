@@ -24,10 +24,22 @@ fn hangman(mut container: WordToCheck) -> io::Result<(i32)> {
     if !word.contains(response) {
         attempts -= 1;
         io::stdout().write_all(format!("Wrong, you have {} left\n", attempts).as_bytes())?;
-        io::stdout().write_all("_".repeat(word.len()).as_bytes())?;
         return Ok(attempts);
     };
-    io::stdout().write_all("_".repeat(word.len()).as_bytes())?;
+    let first = response
+        .chars()
+        .collect::<Vec<char>>()
+        .first()
+        .unwrap()
+        .to_owned();
+    for item in word.chars() {
+        if item == first {
+            io::stdout().write_all(response.as_bytes())?;
+            continue;
+        }
+        io::stdout().write_all("_".as_bytes())?;
+    }
+
     Ok(attempts)
 }
 
