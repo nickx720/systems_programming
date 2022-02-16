@@ -14,17 +14,15 @@ impl WordToCheck {
     }
 }
 
-fn hangman(mut container: WordToCheck) -> io::Result<(i32)> {
+fn hangman(container: WordToCheck, mut display: String) -> io::Result<(i32, String)> {
     let WordToCheck { word, mut attempts } = container;
-    println!("{}", &word);
     let mut buffer = String::new();
     io::stdin().read_line(&mut buffer)?;
     let response = buffer.trim();
-    dbg!(word.contains(response));
     if !word.contains(response) {
         attempts -= 1;
         io::stdout().write_all(format!("Wrong, you have {} left\n", attempts).as_bytes())?;
-        return Ok(attempts);
+        return Ok((attempts, display));
     };
     let first = response
         .chars()
@@ -32,15 +30,16 @@ fn hangman(mut container: WordToCheck) -> io::Result<(i32)> {
         .first()
         .unwrap()
         .to_owned();
-    for item in word.chars() {
+    let mut display_container = display.chars().collect::<Vec<char>>();
+    for (index, item) in word.chars().enumerate() {
         if item == first {
-            io::stdout().write_all(response.as_bytes())?;
+            display_container[index] = item;
             continue;
         }
-        io::stdout().write_all("_".as_bytes())?;
     }
+    display = display_container.iter().cloned().collect::<String>();
 
-    Ok(attempts)
+    Ok((attempts, display))
 }
 
 pub fn warhammer() {
@@ -48,12 +47,14 @@ pub fn warhammer() {
     println!("Guess the word");
     let mut random = thread_rng();
     let word = ANSWERS.iter().choose(&mut random).unwrap();
+    let mut display = "_".repeat(word.len());
     let mut container = WordToCheck::new(word, 5);
 
-    let underscore = "_".repeat(container.word.len());
-    println!("{}", underscore);
     while container.attempts != 0 {
-        container.attempts = hangman(container).unwrap();
+        println!("\n{},", display);
+        let response = hangman(container, display).unwrap();
+        container.attempts = response.0;
+        display = response.1;
     }
     println!("Game over");
 }
