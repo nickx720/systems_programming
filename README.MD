@@ -3,4 +3,3 @@
 Started with creating a basic shell.
 
 Todo
-exercise will be to implement a simple hangman command line game
