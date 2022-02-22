@@ -1,5 +1,6 @@
 ///https://reberhardt.com/cs110l/spring-2020/assignments/week-2-exercises/
 ///https://doc.rust-lang.org/std/primitive.slice.html#method.iter_mut
+/// Part 2 Todo rdiff
 
 fn ownership_one() {
     let mut s = String::from("hello");
