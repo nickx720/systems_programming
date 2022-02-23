@@ -1,4 +1,7 @@
 /// https://github.com/reberhardt7/cs110l-spr-2020-starter-code/blob/main/week2/rdiff/src/main.rs
+/// https://reberhardt.com/cs110l/spring-2020/assignments/week-2-exercises/
+/// Part 2 Todo rdiff
+use super::grid::Grid;
 use std::{
     fs::File,
     io::{BufRead, BufReader, Result},
