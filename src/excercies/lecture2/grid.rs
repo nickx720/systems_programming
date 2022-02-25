@@ -21,6 +21,10 @@ impl Grid {
         (self.num_rows, self.num_cols)
     }
 
+    fn index(&self, row: usize, col: usize) -> usize {
+        row * self.num_cols + col
+    }
+
     /// Returns the element at the specified location. If the location is out of bounds, return
     /// None.
     ///
@@ -30,11 +34,10 @@ impl Grid {
     /// give you more practice with Option :) and because this similar library returns Option:
     /// https://docs.rs/array2d/0.2.1/array2d/struct.Array2D.html
     pub fn get(&self, row: usize, col: usize) -> Option<usize> {
-        let width = self.num_rows;
         let (cur_row, cur_col) = self.size();
-        let index = width * cur_row + cur_col;
-        let get_index = width * row + cur_col;
-        if get_index > index {
+        let index = self.index(cur_row, cur_col);
+        let get_index = self.index(row, col);
+        if get_index >= index {
             return None;
         }
         Some(self.elems[index])
@@ -42,10 +45,16 @@ impl Grid {
 
     /// Sets the element at the specified location to the specified value. If the location is out
     /// of bounds, returns Err with an error message.
-    #[allow(unused)] // TODO: delete this line when you implement this function
     pub fn set(&mut self, row: usize, col: usize, val: usize) -> Result<(), &'static str> {
-        unimplemented!();
-        // Be sure to delete the #[allow(unused)] line above
+        let (cur_row, cur_col) = self.size();
+        let valid_index = self.index(cur_row, cur_col);
+        let index = self.index(row, col);
+        dbg!(index, valid_index, row, col);
+        if index >= valid_index {
+            return Err("Something went wrong");
+        }
+        self.elems[index] = val;
+        Ok(())
     }
 
     /// Prints a visual representation of the grid. You can use this for debugging.
