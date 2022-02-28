@@ -1,3 +1,4 @@
+// https://github.com/reberhardt7/cs110l-spr-2020-starter-code
 // Grid implemented as a flat vector
 pub struct Grid {
     num_rows: usize,
@@ -21,8 +22,13 @@ impl Grid {
         (self.num_rows, self.num_cols)
     }
 
+    // Fix index
     fn index(&self, row: usize, col: usize) -> usize {
-        row * self.num_cols + col
+        let response = row * col;
+        if response >= self.num_rows * self.num_cols {
+            return response - 1;
+        }
+        response
     }
 
     /// Returns the element at the specified location. If the location is out of bounds, return
@@ -49,7 +55,7 @@ impl Grid {
         let (cur_row, cur_col) = self.size();
         let valid_index = self.index(cur_row, cur_col);
         let index = self.index(row, col);
-        dbg!(index, valid_index, row, col);
+        dbg!(index, valid_index, row, col, &self.elems);
         if index >= valid_index {
             return Err("Something went wrong");
         }
