@@ -8,7 +8,7 @@ use std::{
     path::Path,
 };
 
-fn read_file_lines(path: &String) -> Result<(Vec<String>)> {
+fn read_file_lines(path: &String) -> Result<Vec<String>> {
     let file = File::open(Path::new(path))?;
     let mut output: Vec<String> = Vec::new();
     for line in BufReader::new(file).lines() {
@@ -17,6 +17,24 @@ fn read_file_lines(path: &String) -> Result<(Vec<String>)> {
     }
     Ok(output)
 }
+
+#[allow(unused)] // TODO: delete this line when you implement this function
+fn lcs(seq1: &Vec<String>, seq2: &Vec<String>) -> Grid {
+    // Note: Feel free to use unwrap() in this code, as long as you're basically certain it'll
+    // never happen. Conceptually, unwrap() is justified here, because there's not really any error
+    // condition you're watching out for (i.e. as long as your code is written correctly, nothing
+    // external can go wrong that we would want to handle in higher-level functions). The unwrap()
+    // calls act like having asserts in C code, i.e. as guards against programming error.
+    unimplemented!();
+    // Be sure to delete the #[allow(unused)] line above
+}
+
+#[allow(unused)] // TODO: delete this line when you implement this function
+fn print_diff(lcs_table: &Grid, lines1: &Vec<String>, lines2: &Vec<String>, i: usize, j: usize) {
+    unimplemented!();
+    // Be sure to delete the #[allow(unused)] line above
+}
+
 pub fn rdiffmain() {
     let path = String::from("./assets/lecture2/sample.txt");
     read_file_lines(&path);
@@ -36,5 +54,37 @@ mod test {
             lines[0],
             "This week's exercises will continue easing you into Rust and will feature some"
         );
+    }
+
+    #[test]
+    fn test_lcs() {
+        let mut expected = Grid::new(5, 4);
+        expected.set(1, 1, 1).unwrap();
+        expected.set(1, 2, 1).unwrap();
+        expected.set(1, 3, 1).unwrap();
+        expected.set(2, 1, 1).unwrap();
+        expected.set(2, 2, 1).unwrap();
+        expected.set(2, 3, 2).unwrap();
+        expected.set(3, 1, 1).unwrap();
+        expected.set(3, 2, 1).unwrap();
+        expected.set(3, 3, 2).unwrap();
+        expected.set(4, 1, 1).unwrap();
+        expected.set(4, 2, 2).unwrap();
+        expected.set(4, 3, 2).unwrap();
+
+        println!("Expected:");
+        expected.display();
+        let result = lcs(
+            &"abcd".chars().map(|c| c.to_string()).collect(),
+            &"adb".chars().map(|c| c.to_string()).collect(),
+        );
+        println!("Got:");
+        result.display();
+        assert_eq!(result.size(), expected.size());
+        for row in 0..expected.size().0 {
+            for col in 0..expected.size().1 {
+                assert_eq!(result.get(row, col), expected.get(row, col));
+            }
+        }
     }
 }
