@@ -24,7 +24,7 @@ impl Grid {
 
     // Fix index
     fn index(&self, row: usize, col: usize) -> usize {
-        let response = row * col;
+        let response = row * self.num_cols + col;
         if response >= self.num_rows * self.num_cols {
             return response - 1;
         }
@@ -41,22 +41,21 @@ impl Grid {
     /// https://docs.rs/array2d/0.2.1/array2d/struct.Array2D.html
     pub fn get(&self, row: usize, col: usize) -> Option<usize> {
         let (cur_row, cur_col) = self.size();
-        let index = self.index(cur_row, cur_col);
+        let index = cur_row * cur_col;
         let get_index = self.index(row, col);
         if get_index >= index {
             return None;
         }
-        Some(self.elems[index])
+        Some(self.elems[get_index])
     }
 
     /// Sets the element at the specified location to the specified value. If the location is out
     /// of bounds, returns Err with an error message.
     pub fn set(&mut self, row: usize, col: usize, val: usize) -> Result<(), &'static str> {
         let (cur_row, cur_col) = self.size();
-        let valid_index = self.index(cur_row, cur_col);
+        let length = cur_row * cur_col;
         let index = self.index(row, col);
-        dbg!(index, valid_index, row, col, &self.elems);
-        if index >= valid_index {
+        if index >= length {
             return Err("Something went wrong");
         }
         self.elems[index] = val;
