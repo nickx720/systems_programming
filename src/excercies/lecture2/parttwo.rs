@@ -30,10 +30,17 @@ fn lcs(seq1: &Vec<String>, seq2: &Vec<String>) -> Grid {
     for i in 1..row {
         for j in 1..col {
             if seq1[i - 1] == seq2[j - 1] {
-                output.set(i, j, output.get(i - 1, j - 1).unwrap() + 1);
+                if let Some(current_val) = output.get(i - 1, j - 1) {
+                    let _ = output.set(i, j, current_val + 1);
+                }
             } else {
-                let max_val = std::cmp::max(output.get(i, j - 1), output.get(i - 1, j)).unwrap();
-                output.set(i, j, max_val);
+                let (prev_val, curr_val) = (output.get(i, j - 1), output.get(i - 1, j));
+                if let Some(prev_val) = prev_val {
+                    if let Some(curr_val) = curr_val {
+                        let max_val = std::cmp::max(prev_val, curr_val);
+                        let _ = output.set(i, j, max_val);
+                    }
+                }
             }
         }
     }
