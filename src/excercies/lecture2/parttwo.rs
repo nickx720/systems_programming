@@ -18,15 +18,26 @@ fn read_file_lines(path: &String) -> Result<Vec<String>> {
     Ok(output)
 }
 
-#[allow(unused)] // TODO: delete this line when you implement this function
 fn lcs(seq1: &Vec<String>, seq2: &Vec<String>) -> Grid {
     // Note: Feel free to use unwrap() in this code, as long as you're basically certain it'll
     // never happen. Conceptually, unwrap() is justified here, because there's not really any error
     // condition you're watching out for (i.e. as long as your code is written correctly, nothing
     // external can go wrong that we would want to handle in higher-level functions). The unwrap()
     // calls act like having asserts in C code, i.e. as guards against programming error.
-    unimplemented!();
-    // Be sure to delete the #[allow(unused)] line above
+    let row = seq1.len() + 1;
+    let col = seq2.len() + 1;
+    let mut output: Grid = Grid::new(row, col);
+    for i in 1..row {
+        for j in 1..col {
+            if seq1[i - 1] == seq2[j - 1] {
+                output.set(i, j, output.get(i - 1, j - 1).unwrap() + 1);
+            } else {
+                let max_val = std::cmp::max(output.get(i, j - 1), output.get(i - 1, j)).unwrap();
+                output.set(i, j, max_val);
+            }
+        }
+    }
+    output
 }
 
 #[allow(unused)] // TODO: delete this line when you implement this function
