@@ -4,7 +4,7 @@
 use super::grid::Grid;
 use std::{
     fs::File,
-    io::{BufRead, BufReader, Result},
+    io::{self, BufRead, BufReader, Result},
     path::Path,
 };
 
@@ -47,15 +47,35 @@ fn lcs(seq1: &Vec<String>, seq2: &Vec<String>) -> Grid {
     output
 }
 
-#[allow(unused)] // TODO: delete this line when you implement this function
 fn print_diff(lcs_table: &Grid, lines1: &Vec<String>, lines2: &Vec<String>, i: usize, j: usize) {
-    unimplemented!();
-    // Be sure to delete the #[allow(unused)] line above
+    if i > 0 && j > 0 && lines1[i - 1] == lines2[j - 1] {
+        print_diff(lcs_table, lines1, lines2, i, j);
+        println!(" {} ", lines1[i - 1]);
+    } else if j > 0 && (i == 0 || lcs_table.get(i, j - 1) >= lcs_table.get(i - 1, j)) {
+        print_diff(lcs_table, lines1, lines2, i, j - 1);
+        print!("> {}", lines2[j - 1]);
+    } else if i > 0 && (j == 0 || lcs_table.get(i, j - 1) < lcs_table.get(i - 1, j)) {
+        print_diff(lcs_table, lines1, lines2, i - 1, j);
+        println!("< {}", lines1[i - 1]);
+    } else {
+        println!("")
+    }
 }
 
-pub fn rdiffmain() {
-    let path = String::from("./assets/lecture2/sample.txt");
-    read_file_lines(&path);
+pub fn rdiffmain() -> Result<()> {
+    let handout_a = String::from("./assets/lecture2/handout-a.txt");
+    let handout_b = String::from("./assets/lecture2/handout-b.txt");
+    let handout_a = read_file_lines(&handout_a)?;
+    let handout_b = read_file_lines(&handout_b)?;
+    let lcs_table = lcs(&handout_a, &handout_b);
+    print_diff(
+        &lcs_table,
+        &handout_a,
+        &handout_b,
+        handout_a.len(),
+        handout_b.len(),
+    );
+    Ok(())
 }
 
 #[cfg(test)]
