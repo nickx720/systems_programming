@@ -45,8 +45,13 @@ fn life(init: Vec<Cell>, iters: i32, width: i32, height: i32) {
             col = generation(col);
         }
         // Initiate drawing here
-        nannou::sketch(view).run();
+        print_colony(&col, width, height);
     }
+}
+
+fn print_colony(col: &Colony, width: i32, height: i32) {
+    dbg!(width);
+    nannou::sketch(view).run();
 }
 
 fn view(app: &App, frame: Frame) {
@@ -65,4 +70,6 @@ fn view(app: &App, frame: Frame) {
 pub fn main() {
     let blinker = vec![(1, 0), (1, 1), (1, 2)];
     life(blinker, 3, 3, 3);
+    let glider = vec![(1, 0), (2, 1), (0, 2), (1, 2), (2, 2)];
+    life(glider, 20, 8, 8);
 }
