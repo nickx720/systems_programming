@@ -2,4 +2,4 @@
 
 Started with creating a basic shell.
 
-Todo
+Todo Window Coordinates

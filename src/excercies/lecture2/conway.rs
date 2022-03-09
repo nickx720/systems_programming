@@ -50,21 +50,16 @@ fn life(init: Vec<Cell>, iters: i32, width: i32, height: i32) {
 }
 
 fn print_colony(col: &Colony, width: i32, height: i32) {
-    dbg!(width);
-    nannou::sketch(view).run();
-}
-
-fn view(app: &App, frame: Frame) {
-    let draw = app.draw();
-
-    draw.background().color(CORNFLOWERBLUE);
-
-    let win = app.window_rect();
-    draw.tri()
-        .points(win.bottom_left(), win.top_left(), win.top_right())
-        .color(VIOLET);
-
-    draw.to_frame(app, &frame).unwrap();
+    for y in 0..height {
+        for x in 0..width {
+            if col.contains(&(x, y)) {
+                print!("0")
+            } else {
+                print!(".")
+            }
+        }
+        println!();
+    }
 }
 
 pub fn main() {
@@ -72,4 +67,29 @@ pub fn main() {
     life(blinker, 3, 3, 3);
     let glider = vec![(1, 0), (2, 1), (0, 2), (1, 2), (2, 2)];
     life(glider, 20, 8, 8);
+    nannou::app(model).update(update).run();
+}
+
+struct Model {
+    _window: window::Id,
+}
+
+fn model(app: &App) -> Model {
+    let _window = app.new_window().view(view).build().unwrap();
+    Model { _window }
+}
+
+fn update(_app: &App, _model: &mut Model, _update: Update) {}
+
+fn view(app: &App, _model: &Model, frame: Frame) {
+    let draw = app.draw();
+    draw.background().color(PLUM);
+    // https://guide.nannou.cc/tutorials/basics/window-coordinates.html
+    for y in 0..10 {
+        draw.ellipse()
+            .x_y(0.0, y as f32)
+            .w_h(100.0, 100.0)
+            .color(STEELBLUE);
+    }
+    draw.to_frame(app, &frame).unwrap();
 }
