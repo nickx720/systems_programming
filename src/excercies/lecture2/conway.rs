@@ -37,24 +37,25 @@ fn generation(col: Colony) -> Colony {
         .collect()
 }
 
-fn life(init: Vec<Cell>, iters: i32, width: i32, height: i32) {
+fn life(init: Vec<Cell>, iters: i32, width: i32, height: i32, draw: &Draw) {
     let mut col: Colony = init.into_iter().collect();
     for i in 0..iters + 1 {
-        println!("({i})");
         if i != 0 {
             col = generation(col);
         }
         // Initiate drawing here
-        print_colony(&col, width, height);
+        print_colony(&col, width, height, draw);
     }
 }
 
-fn print_colony(col: &Colony, width: i32, height: i32) {
+fn print_colony(col: &Colony, width: i32, height: i32, draw: &Draw) {
     for y in 0..height {
         for x in 0..width {
             if col.contains(&(x, y)) {
+                //                draw.ellipse().x_y(1.1, 2.1).w_h(20.0, 20.0).color(RED);
                 print!("0")
             } else {
+                //draw.rect().x_y(25.1, 25.2).w_h(20.0, 20.0).color(STEELBLUE);
                 print!(".")
             }
         }
@@ -63,10 +64,6 @@ fn print_colony(col: &Colony, width: i32, height: i32) {
 }
 
 pub fn main() {
-    // let blinker = vec![(1, 0), (1, 1), (1, 2)];
-    // life(blinker, 3, 3, 3);
-    // let glider = vec![(1, 0), (2, 1), (0, 2), (1, 2), (2, 2)];
-    // life(glider, 20, 8, 8);
     nannou::app(model).update(update).run();
 }
 
@@ -78,7 +75,6 @@ fn model(app: &App) -> Model {
     let _window = app
         .new_window()
         .title("Life of Conway")
-        .event(event_test)
         .view(view)
         .build()
         .unwrap();
@@ -91,15 +87,9 @@ fn view(app: &App, _model: &Model, frame: Frame) {
     let draw = app.draw();
     draw.background().color(PLUM);
     // https://guide.nannou.cc/tutorials/basics/window-coordinates.html
-    for y in (10..100).step_by(8) {
-        let (x, y) = (y as f32, y as f32);
-        draw.ellipse().x_y(x, y).w_h(10.0, 10.0).color(STEELBLUE);
-    }
+    let blinker = vec![(1, 0), (1, 1), (1, 2)];
+    life(blinker, 3, 3, 3, &draw);
+    //    let glider = vec![(1, 0), (2, 1), (0, 2), (1, 2), (2, 2)];
+    //    life(glider, 20, 8, 8, &draw);
     draw.to_frame(app, &frame).unwrap();
-}
-
-// Can we use the hover event?
-
-fn event_test(_app: &App, _model: &mut Model, event: WindowEvent) {
-    println!("window a is {event:?}");
 }
