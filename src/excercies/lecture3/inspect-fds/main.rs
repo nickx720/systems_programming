@@ -4,6 +4,8 @@ mod open_file;
 mod process;
 mod ps_utils;
 
+use ps_utils::get_target;
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
@@ -14,7 +16,7 @@ fn main() {
     let target = &args[1];
 
     // TODO: Milestone 1: Get the target Process using psutils::get_target()
-    unimplemented!();
+    let pid = get_target(target).unwrap();
 }
 
 #[cfg(test)]
