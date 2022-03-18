@@ -13,4 +13,15 @@ impl Process {
     pub fn new(pid: usize, ppid: usize, command: String) -> Process {
         Process { pid, ppid, command }
     }
+    /// This function returns a list of (fdnumber, OpenFile) tuples, if file descriptor
+    /// information is available (it returns None otherwise). The information is commonly
+    /// unavailable if the process has already exited.
+    #[allow(unused)] // TODO: delete this line for Milestone 4
+    pub fn list_open_files(&self) -> Option<Vec<(usize, OpenFile)>> {
+        let mut open_files = vec![];
+        for fd in self.list_fds()? {
+            open_files.push((fd, OpenFile::from_fd(self.pid, fd)?));
+        }
+        Some(open_files)
+    }
 }
