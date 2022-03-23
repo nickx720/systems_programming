@@ -22,6 +22,7 @@ impl Process {
     #[allow(unused)] // TODO: delete this line for Milestone 3
     pub fn list_fds(&self) -> Option<Vec<usize>> {
         // TODO: implement for Milestone 3
+        let command = fs.dir();
         unimplemented!();
     }
 
