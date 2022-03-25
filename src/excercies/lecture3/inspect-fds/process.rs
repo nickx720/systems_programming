@@ -22,26 +22,31 @@ impl Process {
     #[allow(unused)] // TODO: delete this line for Milestone 3
     pub fn list_fds(&self) -> Option<Vec<usize>> {
         // TODO: implement for Milestone 3
-     if let Ok(home_dir) = env::var("HOME"){
-           let this_pid = self.pid;
-           let dir = format!("/proc/{this_pid}/fd");
-           let entries = fs::read_dir(dir).ok()?
-               .map(|res| res.map(|entry| entry.file_name()))
-               .map(|item| {
-                   if let Some(response)= item.to_str(){
-                       response.to_string()
-                   }
-               })
-               .collect::<Result<Vec<_>,io::Error>>().ok()?;
-           let string_entries = entries.iter().map(|item| {
-               if let Some(response) = item.to_str(){
-                   response.to_string()
-               } else {
-                   String::new()
-               }          }).collect::<Vec<String>>();
-           dbg!(string_entries);
+        if let Ok(_) = env::var("HOME") {
+            let this_pid = self.pid;
+            let dir = format!("/proc/{this_pid}/fd");
+            let entries = fs::read_dir(dir)
+                .ok()?
+                .map(|res| res.map(|entry| entry.file_name()))
+                .collect::<Result<Vec<_>, io::Error>>()
+                .ok()?;
 
-        unimplemented!();
+            let collect_usize = entries
+                .iter()
+                .map(|item| item.to_str())
+                .filter(|item| item.is_some())
+                .map(|item| item.unwrap_or("0").parse::<usize>().unwrap_or(0))
+                .collect::<Vec<usize>>();
+            (Some(collect_usize))
+        //    for entry in fs::read_dir(dir).ok()?{
+        //        // Unwrap from option
+        //        if let Some(path) = entry.ok()?.file_name().to_str().map(|s| s){
+        //        println!("{path}");
+        //        }
+        //    }
+        } else {
+            None
+        }
     }
 
     /// This function returns a list of (fdnumber, OpenFile) tuples, if file descriptor
