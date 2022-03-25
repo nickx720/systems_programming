@@ -22,7 +22,25 @@ impl Process {
     #[allow(unused)] // TODO: delete this line for Milestone 3
     pub fn list_fds(&self) -> Option<Vec<usize>> {
         // TODO: implement for Milestone 3
-        let command = fs.dir();
+     if let Ok(home_dir) = env::var("HOME"){
+           let this_pid = self.pid;
+           let dir = format!("/proc/{this_pid}/fd");
+           let entries = fs::read_dir(dir).ok()?
+               .map(|res| res.map(|entry| entry.file_name()))
+               .map(|item| {
+                   if let Some(response)= item.to_str(){
+                       response.to_string()
+                   }
+               })
+               .collect::<Result<Vec<_>,io::Error>>().ok()?;
+           let string_entries = entries.iter().map(|item| {
+               if let Some(response) = item.to_str(){
+                   response.to_string()
+               } else {
+                   String::new()
+               }          }).collect::<Vec<String>>();
+           dbg!(string_entries);
+
         unimplemented!();
     }
 
