@@ -21,6 +21,36 @@ impl Process {
     /// descriptor table.)
     #[allow(unused)] // TODO: delete this line for Milestone 3
     pub fn list_fds(&self) -> Option<Vec<usize>> {
+        pub fn list_fds(&self) -> Option<Vec<usize>> {
+            if let Ok(_) = env::var("HOME") {
+                let this_pid = self.pid;
+                let dir = format!("/proc/{this_pid}/fd");
+                let entries = fs::read_dir(dir)
+                    .ok()?
+                    .map(|res| res.map(|entry| entry.file_name()))
+                    .collect::<Result<Vec<_>, io::Error>>()
+                    .ok()?;
+                let string_entries = entries
+                    .iter()
+                    .map(|item| {
+                        if let Some(response) = item.to_str() {
+                            response.parse::<usize>().unwrap()
+                        } else {
+                            0
+                        }
+                    })
+                    .collect::<Vec<usize>>();
+                return Some(string_entries);
+                //    for entry in fs::read_dir(dir).ok()?{
+                //        // Unwrap from option
+                //        if let Some(path) = entry.ok()?.file_name().to_str().map(|s| s){
+                //        println!("{path}");
+                //        }
+                //    }
+            }
+            // TODO: implement for Milestone 3
+            None
+        }
         // TODO: implement for Milestone 3
         if let Ok(_) = env::var("HOME") {
             let this_pid = self.pid;
