@@ -91,3 +91,15 @@ impl Process {
         Some(open_files)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::ps_utils;
+    use std::process::{Child, Command};
+
+    fn start_c_program(program: &str) -> Child {
+        Command::new(program)
+            .spawn()
+            .expect(&format!("Could not find {}. Have you run make?", program))
+    }
+}
