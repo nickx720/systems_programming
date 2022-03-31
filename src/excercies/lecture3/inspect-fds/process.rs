@@ -21,38 +21,7 @@ impl Process {
     /// descriptor table.)
     #[allow(unused)] // TODO: delete this line for Milestone 3
     pub fn list_fds(&self) -> Option<Vec<usize>> {
-        pub fn list_fds(&self) -> Option<Vec<usize>> {
-            if let Ok(_) = env::var("HOME") {
-                let this_pid = self.pid;
-                let dir = format!("/proc/{this_pid}/fd");
-                let entries = fs::read_dir(dir)
-                    .ok()?
-                    .map(|res| res.map(|entry| entry.file_name()))
-                    .collect::<Result<Vec<_>, io::Error>>()
-                    .ok()?;
-                let string_entries = entries
-                    .iter()
-                    .map(|item| {
-                        if let Some(response) = item.to_str() {
-                            response.parse::<usize>().unwrap()
-                        } else {
-                            0
-                        }
-                    })
-                    .collect::<Vec<usize>>();
-                return Some(string_entries);
-                //    for entry in fs::read_dir(dir).ok()?{
-                //        // Unwrap from option
-                //        if let Some(path) = entry.ok()?.file_name().to_str().map(|s| s){
-                //        println!("{path}");
-                //        }
-                //    }
-            }
-            // TODO: implement for Milestone 3
-            None
-        }
-        // TODO: implement for Milestone 3
-        if let Ok(_) = env::var("HOME") {
+        if let Ok(response) = env::var("HOME") {
             let this_pid = self.pid;
             let dir = format!("/proc/{this_pid}/fd");
             let entries = fs::read_dir(dir)
@@ -60,21 +29,19 @@ impl Process {
                 .map(|res| res.map(|entry| entry.file_name()))
                 .collect::<Result<Vec<_>, io::Error>>()
                 .ok()?;
-
-            let collect_usize = entries
+            let string_entries = entries
                 .iter()
-                .map(|item| item.to_str())
-                .filter(|item| item.is_some())
-                .map(|item| item.unwrap_or("0").parse::<usize>().unwrap_or(0))
+                .map(|item| {
+                    if let Some(response) = item.to_str() {
+                        response.parse::<usize>().unwrap()
+                    } else {
+                        0
+                    }
+                })
                 .collect::<Vec<usize>>();
-            (Some(collect_usize))
-        //    for entry in fs::read_dir(dir).ok()?{
-        //        // Unwrap from option
-        //        if let Some(path) = entry.ok()?.file_name().to_str().map(|s| s){
-        //        println!("{path}");
-        //        }
-        //    }
+            Some(string_entries)
         } else {
+            println!("Hello");
             None
         }
     }
@@ -101,5 +68,17 @@ mod test {
         Command::new(program)
             .spawn()
             .expect(&format!("Could not find {}. Have you run make?", program))
+    }
+    #[test]
+    fn test_list_fds() {
+        let mut test_subprocess = start_c_program("./multi_pipe_test");
+        let process = ps_utils::get_target("multi_pipe_test").unwrap().unwrap();
+        assert_eq!(
+            process
+                .list_fds()
+                .expect("Expected list_fds to find file descriptors, but it returned None"),
+            vec![0, 1, 2, 4, 5]
+        );
+        let _ = test_subprocess.kill();
     }
 }

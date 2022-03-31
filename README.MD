@@ -2,4 +2,5 @@
 
 Started with creating a basic shell.
 
-Todo Window Coordinates
+Rust System courses
+`https://github.com/AbdesamedBendjeddou/Rusty-CS#systems-fundamentals`
