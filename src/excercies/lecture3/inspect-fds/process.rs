@@ -41,7 +41,6 @@ impl Process {
                 .collect::<Vec<usize>>();
             Some(string_entries)
         } else {
-            println!("Hello");
             None
         }
     }
@@ -49,7 +48,6 @@ impl Process {
     /// This function returns a list of (fdnumber, OpenFile) tuples, if file descriptor
     /// information is available (it returns None otherwise). The information is commonly
     /// unavailable if the process has already exited.
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     pub fn list_open_files(&self) -> Option<Vec<(usize, OpenFile)>> {
         let mut open_files = vec![];
         for fd in self.list_fds()? {
@@ -78,6 +76,16 @@ mod test {
                 .list_fds()
                 .expect("Expected list_fds to find file descriptors, but it returned None"),
             vec![0, 1, 2, 4, 5]
+        );
+        let _ = test_subprocess.kill();
+    }
+    #[test]
+    fn test_list_fds_zombie() {
+        let mut test_subprocess = start_c_program("./nothing");
+        let process = ps_utils::get_target("nothing").unwrap().unwrap();
+        assert!(
+            process.list_fds().is_none(),
+            "Expected list_fds to return None for a zombie process"
         );
         let _ = test_subprocess.kill();
     }
