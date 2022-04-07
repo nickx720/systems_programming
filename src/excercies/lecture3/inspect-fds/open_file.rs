@@ -17,3 +17,16 @@ const COLORS: [&str; 6] = [
     "\x1B[38;5;13m",
     "\x1B[38;5;14m",
 ];
+
+#[allow(unused)] // TODO: delete this line for Milestone 4
+const CLEAR_COLOR: &str = "\x1B[0m";
+
+/// This enum can be used to represent whether a file is read-only, write-only, or read/write. An
+/// enum is basically a value that can be one of some number of "things."
+#[allow(unused)] // TODO: delete this line for Milestone 4
+#[derive(Debug, Clone, PartialEq)]
+pub enum AccessMode {
+    Read,
+    Write,
+    ReadWrite,
+}
