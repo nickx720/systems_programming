@@ -30,3 +30,52 @@ pub enum AccessMode {
     Write,
     ReadWrite,
 }
+impl fmt::Display for AccessMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // Match operators are very commonly used with enums in Rust. They function similar to
+        // switch statements in other languages (but can be more expressive).
+        match self {
+            AccessMode::Read => write!(f, "{}", "read"),
+            AccessMode::Write => write!(f, "{}", "write"),
+            AccessMode::ReadWrite => write!(f, "{}", "read/write"),
+        }
+    }
+}
+
+/// Stores information about an open file on the system. Since the Linux kernel doesn't really
+/// expose much information about the open file table to userspace (cplayground uses a modified
+/// kernel), this struct contains info from both the open file table and the vnode table.
+#[derive(Debug, Clone, PartialEq)]
+pub struct OpenFile {
+    pub name: String,
+    pub cursor: usize,
+    pub access_mode: AccessMode,
+}
+
+impl OpenFile {
+    #[allow(unused)] // TODO: delete this line for Milestone 4
+    pub fn new(name: String, cursor: usize, access_mode: AccessMode) -> OpenFile {
+        OpenFile {
+            name,
+            cursor,
+            access_mode,
+        }
+    }
+
+    /// This function takes a path of an open file and returns a more human-friendly name for that
+    /// file.
+    ///
+    /// * For regular files, this will simply return the supplied path.
+    /// * For terminals (files starting with /dev/pts), this will return "<terminal>".
+    /// * For pipes (filenames formatted like pipe:[pipenum]), this will return "<pipe #pipenum>".
+    #[allow(unused)] // TODO: delete this line for Milestone 4
+    fn path_to_name(path: &str) -> String {
+        if path.starts_with("/dev/pts/") {
+            String::from("<terminal>")
+        } else if path.starts_with("pipe:[") && path.ends_with("]") {
+            let pipe_num = &path[path.find('[').unwrap() + 1..path.find(']').unwrap()];
+            format!("<pipe #{}>", pipe_num)
+        } else {
+            String::from(path)
+        }
+    }
