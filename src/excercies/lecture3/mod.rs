@@ -2,3 +2,4 @@
 /// https://reberhardt.com/cs110l/spring-2020/assignments/week-3-exercises/
 /// Todo Milestone 2 Print under process
 ///
+pub mod linked_list;
