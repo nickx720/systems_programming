@@ -20,9 +20,12 @@ impl<T> Node<T> {
     }
 }
 
-impl<T> PartialEq for Node<T> {
+impl<T> PartialEq for Node<T>
+where
+    T: std::cmp::PartialEq,
+{
     fn eq(&self, other: &Self) -> bool {
-        self == other
+        self.value == other.value && self.next == other.next
     }
 }
 
@@ -109,8 +112,11 @@ where
     }
 }
 
-impl<T> PartialEq for LinkedList<T> {
+impl<T> PartialEq for LinkedList<T>
+where
+    T: std::cmp::PartialEq,
+{
     fn eq(&self, other: &Self) -> bool {
-        self == other
+        self.size == other.size && self.head == other.head
     }
 }
