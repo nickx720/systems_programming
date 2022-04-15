@@ -20,6 +20,12 @@ impl<T> Node<T> {
     }
 }
 
+impl<T> PartialEq for Node<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self == other
+    }
+}
+
 impl<T> Clone for Node<T>
 where
     T: Clone + Copy,
@@ -100,5 +106,11 @@ where
             head: self.head.clone(),
             size: self.size,
         }
+    }
+}
+
+impl<T> PartialEq for LinkedList<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self == other
     }
 }
