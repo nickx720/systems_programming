@@ -6,7 +6,7 @@ pub struct LinkedList<T> {
     size: usize,
 }
 
-struct Node<T> {
+pub struct Node<T> {
     value: T,
     next: Option<Box<Node<T>>>,
 }

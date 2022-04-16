@@ -1,5 +1,6 @@
 use linked_list::LinkedList;
 pub mod linked_list;
+pub mod linked_list_iter;
 
 pub fn linkedmain() {
     let mut list: LinkedList<u32> = LinkedList::new();
