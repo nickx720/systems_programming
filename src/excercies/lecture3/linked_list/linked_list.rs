@@ -2,13 +2,13 @@ use std::fmt::{self, Display};
 use std::option::Option;
 
 pub struct LinkedList<T> {
-    head: Option<Box<Node<T>>>,
-    size: usize,
+    pub head: Option<Box<Node<T>>>,
+    pub size: usize,
 }
 
 pub struct Node<T> {
-    value: T,
-    next: Option<Box<Node<T>>>,
+    pub value: T,
+    pub next: Option<Box<Node<T>>>,
 }
 
 impl<T> Node<T> {

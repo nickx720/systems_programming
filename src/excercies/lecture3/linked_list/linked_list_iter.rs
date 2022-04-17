@@ -1,4 +1,4 @@
-use super::linked_list::Node;
+use super::linked_list::{LinkedList, Node};
 
 pub struct LinkedListIter<'a> {
     current: &'a Option<Box<Node<u32>>>,
@@ -18,7 +18,7 @@ impl Iterator for LinkedListIter<'_> {
     }
 }
 // For linked list, read the docs completely
-impl<'a> IntoIterator for &'a LinkedList {
+impl<'a> IntoIterator for &'a LinkedList<u32> {
     type Item = u32;
     type IntoIter = LinkedListIter<'a>;
     fn into_iter(self) -> LinkedListIter<'a> {
