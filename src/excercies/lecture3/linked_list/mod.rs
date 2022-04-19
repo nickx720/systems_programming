@@ -9,14 +9,6 @@ pub fn linkedmain() {
     for i in 1..12 {
         list.push_front(i);
     }
-    let mut list2: LinkedList<u32> = LinkedList::new();
-    for i in 1..12 {
-        list2.push_front(i);
-    }
-    println!("{}", list);
-    if list == list2 {
-        println!("Equal");
-    }
     println!("list size: {}", list.get_size());
     println!("top element: {}", list.pop_front().unwrap());
     println!("{}", list);
@@ -24,7 +16,8 @@ pub fn linkedmain() {
     println!("{}", list.to_string()); // ToString impl for anything impl Display
 
     // If you implement iterator trait:
-    //for val in &list {
-    //    println!("{}", val);
-    //}
+    for val in &list {
+        println!("{}", val);
+        break;
+    }
 }

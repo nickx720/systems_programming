@@ -1,27 +1,35 @@
 use super::linked_list::{LinkedList, Node};
 
-pub struct LinkedListIter<'a> {
-    current: &'a Option<Box<Node<u32>>>,
+pub struct LinkedListIter<'a, T> {
+    current: &'a Option<Box<Node<T>>>,
 }
 
-impl Iterator for LinkedListIter<'_> {
-    type Item = u32;
+impl<T> Iterator for LinkedListIter<'_, T>
+where
+    T: Copy,
+{
+    type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         match self.current {
             Some(node) => {
-                todo!()
+                if let Some(next) = node.next.as_ref() {
+                    Some(next.value)
+                } else {
+                    None
+                }
             }
-            None => {
-                todo!()
-            }
+            None => None,
         }
     }
 }
 // For linked list, read the docs completely
-impl<'a> IntoIterator for &'a LinkedList<u32> {
-    type Item = u32;
-    type IntoIter = LinkedListIter<'a>;
-    fn into_iter(self) -> LinkedListIter<'a> {
+impl<'a, T> IntoIterator for &'a LinkedList<T>
+where
+    T: Copy,
+{
+    type Item = T;
+    type IntoIter = LinkedListIter<'a, T>;
+    fn into_iter(self) -> LinkedListIter<'a, T> {
         LinkedListIter {
             current: &self.head,
         }
