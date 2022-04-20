@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use super::linked_list::{LinkedList, Node};
 
 pub struct LinkedListIter<'a, T> {
@@ -6,18 +8,12 @@ pub struct LinkedListIter<'a, T> {
 
 impl<T> Iterator for LinkedListIter<'_, T>
 where
-    T: Copy,
+    T: Copy + Debug,
 {
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         match self.current {
-            Some(node) => {
-                if let Some(next) = node.next.as_ref() {
-                    Some(next.value)
-                } else {
-                    None
-                }
-            }
+            Some(node) => Some(self.current.as_ref().unwrap().value),
             None => None,
         }
     }
@@ -25,7 +21,7 @@ where
 // For linked list, read the docs completely
 impl<'a, T> IntoIterator for &'a LinkedList<T>
 where
-    T: Copy,
+    T: Copy + Debug,
 {
     type Item = T;
     type IntoIter = LinkedListIter<'a, T>;
