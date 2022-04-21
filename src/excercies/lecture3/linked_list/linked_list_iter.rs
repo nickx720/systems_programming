@@ -13,7 +13,11 @@ where
     type Item = T;
     fn next(&mut self) -> Option<Self::Item> {
         match self.current {
-            Some(node) => Some(self.current.as_ref().unwrap().value),
+            Some(_node) => {
+                let cur_node = self.current.as_ref().unwrap().value;
+                self.current = &self.current.as_ref().unwrap().next;
+                Some(cur_node)
+            }
             None => None,
         }
     }

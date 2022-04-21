@@ -18,6 +18,6 @@ pub fn linkedmain() {
     // If you implement iterator trait:
     for val in &list {
         println!("{}", val);
-        break;
     }
+    println!("Completed");
 }
