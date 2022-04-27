@@ -2,6 +2,8 @@ use nix::sys::ptrace;
 use nix::sys::signal;
 use nix::sys::wait::{waitpid, WaitPidFlag, WaitStatus};
 use nix::unistd::Pid;
+use std::os::unix::prelude::CommandExt;
+// use std::process::os::unix::process::CommandExt;
 use std::process::{Child, Command};
 
 pub enum Status {
@@ -35,10 +37,13 @@ impl Inferior {
     /// an error is encountered.
     pub fn new(target: &str, args: &Vec<String>) -> Option<Inferior> {
         // TODO: implement me!
-        Command::new(target)
-            .args(args)
-            .output()
-            .expect("failed to execute process");
+        unsafe {
+            let mut commands = Command::new(target)
+                .args(args)
+                .pre_exec(child_traceme)
+                .output()
+                .expect("failed to execute process");
+        }
         println!(
             "Inferior::new not implemented! target={}, args={:?}",
             target, args
