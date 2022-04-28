@@ -47,7 +47,7 @@ impl Inferior {
         let inferior = Inferior {
             child: child_process,
         };
-        inferior.wait(None);
+        match inferior.wait(None) {}
         println!(
             "Inferior::new not implemented! target={}, args={:?}",
             target, args
