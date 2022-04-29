@@ -47,12 +47,16 @@ impl Inferior {
         let inferior = Inferior {
             child: child_process,
         };
-        match inferior.wait(None) {}
-        println!(
-            "Inferior::new not implemented! target={}, args={:?}",
-            target, args
-        );
-        None
+        let status = inferior.wait(None);
+        if status.is_ok() {
+            Some(inferior)
+        } else {
+            println!(
+                "Inferior::new not implemented! target={}, args={:?}",
+                target, args
+            );
+            None
+        }
     }
 
     /// Returns the pid of this inferior.
