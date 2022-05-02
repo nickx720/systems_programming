@@ -35,13 +35,12 @@ impl Inferior {
     /// Attempts to start a new inferior process. Returns Some(Inferior) if successful, or None if
     /// an error is encountered.
     pub fn new(target: &str, args: &Vec<String>) -> Option<Inferior> {
-        // TODO: implement me!
         let child_process = unsafe {
             let child_process = Command::new(target)
                 .args(args)
                 .pre_exec(child_traceme)
                 .spawn()
-                .expect("failed to execute process");
+                .expect(format!("{target} failed to execute process").as_str());
             child_process
         };
         let inferior = Inferior {
@@ -49,7 +48,7 @@ impl Inferior {
         };
         let status = inferior.wait(None);
         if status.is_ok() {
-            Some(inferior)
+            return Some(inferior);
         } else {
             println!(
                 "Inferior::new not implemented! target={}, args={:?}",
