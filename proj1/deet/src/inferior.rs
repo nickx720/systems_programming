@@ -48,6 +48,14 @@ impl Inferior {
         };
         let status = inferior.wait(None);
         if status.is_ok() {
+            match status {
+                Ok(resp) => match resp {
+                    Status::Signaled(signal) => println!("{signal}"),
+                    Status::Stopped(signal, reg) => println!("{signal}{reg}"),
+                    _ => eprint!("Paniced"),
+                },
+                Err(e) => eprint!("{e}"),
+            }
             return Some(inferior);
         } else {
             println!(
