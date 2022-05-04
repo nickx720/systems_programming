@@ -51,7 +51,8 @@ impl Inferior {
             match status {
                 Ok(resp) => match resp {
                     Status::Signaled(signal) => println!("{signal}"),
-                    Status::Stopped(signal, reg) => println!("{signal}{reg}"),
+                    Status::Stopped(signal, reg) => println!("{signal} with the id {reg}"),
+                    Status::Exited(code) => println!("Child Exited (status {code})"),
                     _ => eprint!("Paniced"),
                 },
                 Err(e) => eprint!("{e}"),
@@ -83,5 +84,10 @@ impl Inferior {
             }
             other => panic!("waitpid returned unexpected status: {:?}", other),
         })
+    }
+
+    /// Continue method
+    pub fn continue_exec(&self) -> Result<Status, nix::Error> {
+        todo!()
     }
 }
