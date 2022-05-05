@@ -16,6 +16,8 @@ pub enum Status {
     /// Indicates the inferior exited due to a signal. Contains the signal that killed the
     /// process.
     Signaled(signal::Signal),
+    ///indicates the process has been restarted
+    Restart,
 }
 
 /// This function calls ptrace with PTRACE_TRACEME to enable debugging on a process. You should use
@@ -46,17 +48,8 @@ impl Inferior {
         let inferior = Inferior {
             child: child_process,
         };
-        let status = inferior.wait(None);
+        let status = inferior.continue_exec();
         if status.is_ok() {
-            match status {
-                Ok(resp) => match resp {
-                    Status::Signaled(signal) => println!("{signal}"),
-                    Status::Stopped(signal, reg) => println!("{signal} with the id {reg}"),
-                    Status::Exited(code) => println!("Child Exited (status {code})"),
-                    _ => eprint!("Paniced"),
-                },
-                Err(e) => eprint!("{e}"),
-            }
             return Some(inferior);
         } else {
             println!(
@@ -88,6 +81,17 @@ impl Inferior {
 
     /// Continue method
     pub fn continue_exec(&self) -> Result<Status, nix::Error> {
-        todo!()
+        ptrace::cont(self.pid(), None);
+        let status = self.wait(None);
+        match status {
+            Ok(resp) => match resp {
+                Status::Signaled(signal) => println!("{signal}"),
+                Status::Stopped(signal, reg) => println!("{signal} with the id {reg}"),
+                Status::Exited(code) => println!("Child Exited (status {code})"),
+                _ => eprint!("Paniced"),
+            },
+            Err(e) => eprint!("{e}"),
+        }
+        Ok(Status::Restart)
     }
 }
