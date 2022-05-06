@@ -45,6 +45,9 @@ impl Debugger {
                 DebuggerCommand::Quit => {
                     return;
                 }
+                DebuggerCommand::Cont => {
+                    todo!()
+                }
             }
         }
     }
