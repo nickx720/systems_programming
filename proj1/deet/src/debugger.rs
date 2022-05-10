@@ -46,7 +46,11 @@ impl Debugger {
                     return;
                 }
                 DebuggerCommand::Cont => {
-                    todo!()
+                    if let Some(inferior) = &self.inferior {
+                        inferior.continue_exec();
+                    } else {
+                        println!("Error resuming process subprocess");
+                    }
                 }
             }
         }
