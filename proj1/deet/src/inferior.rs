@@ -86,7 +86,7 @@ impl Inferior {
         match status {
             Ok(resp) => match resp {
                 Status::Signaled(signal) => println!("{signal}"),
-                Status::Stopped(signal, reg) => println!("{signal} with the id {reg}"),
+                Status::Stopped(signal, _reg) => println!("Child stopped with (signal {signal})"),
                 Status::Exited(code) => println!("Child Exited (status {code})"),
                 _ => eprint!("Paniced"),
             },
