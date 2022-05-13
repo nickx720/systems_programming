@@ -94,4 +94,9 @@ impl Inferior {
         }
         Ok(Status::Restart)
     }
+
+    pub fn print_backtrace(&self) -> Result<(), nix::Error> {
+        println!("Hello World");
+        Ok(())
+    }
 }
