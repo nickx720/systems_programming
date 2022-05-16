@@ -96,6 +96,7 @@ impl Inferior {
     }
 
     pub fn print_backtrace(&self) -> Result<(), nix::Error> {
+        let regs = ptrace::getregs(self.pid())?;
         println!("Hello World");
         Ok(())
     }
