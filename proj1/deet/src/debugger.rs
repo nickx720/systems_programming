@@ -52,6 +52,13 @@ impl Debugger {
                         println!("Error resuming process subprocess");
                     }
                 }
+                DebuggerCommand::Backtrace => {
+                    if let Some(inferior) = &self.inferior {
+                        inferior.print_backtrace();
+                    } else {
+                        eprintln!("Error backtracing");
+                    }
+                }
             }
         }
     }
