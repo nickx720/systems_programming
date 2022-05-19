@@ -5,6 +5,10 @@ use nix::unistd::Pid;
 use std::os::unix::process::CommandExt;
 use std::process::{Child, Command};
 
+use crate::dwarf_data::DwarfData;
+
+use crate::dwarf_data::DwarfData;
+
 pub enum Status {
     /// Indicates inferior stopped. Contains the signal that stopped the process, as well as the
     /// current instruction pointer that it is stopped at.
@@ -95,9 +99,10 @@ impl Inferior {
         Ok(Status::Restart)
     }
 
-    pub fn print_backtrace(&self) -> Result<(), nix::Error> {
+    pub fn print_backtrace(&self, debug_data: DwarfData) -> Result<(), nix::Error> {
         let regs = ptrace::getregs(self.pid())?;
-        println!("{:#x}", regs.rip);
+        let line_number = debug_data.get_line_from_addr(regs.rip);
+        println!("%rip regiester: {:#x} {:?}", regs.rip, line_number);
         Ok(())
     }
 }
