@@ -5,9 +5,7 @@ use nix::unistd::Pid;
 use std::os::unix::process::CommandExt;
 use std::process::{Child, Command};
 
-use crate::dwarf_data::DwarfData;
-
-use crate::dwarf_data::DwarfData;
+use crate::debugger::Debugger;
 
 pub enum Status {
     /// Indicates inferior stopped. Contains the signal that stopped the process, as well as the
@@ -99,10 +97,15 @@ impl Inferior {
         Ok(Status::Restart)
     }
 
-    pub fn print_backtrace(&self, debug_data: DwarfData) -> Result<(), nix::Error> {
+    pub fn print_backtrace(&self, debugger: &Debugger) -> Result<(), nix::Error> {
         let regs = ptrace::getregs(self.pid())?;
-        let line_number = debug_data.get_line_from_addr(regs.rip);
-        println!("%rip regiester: {:#x} {:?}", regs.rip, line_number);
+        let line_number = debugger.dwarf_get_line_from_addr(regs.rip as usize);
+        let file_name = debugger.dwarf_get_function_from_addr(regs.rip as usize);
+        match (line_number, file_name) {
+            (Some(line), Some(file)) => println!("{file} ({line})"),
+            (None, None) => eprintln!("Nothing to show"),
+            _ => unreachable!(),
+        };
         Ok(())
     }
 }

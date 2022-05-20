@@ -1,5 +1,5 @@
 use crate::debugger_command::DebuggerCommand;
-use crate::dwarf_data::{DwarfData, Error as DwarfError};
+use crate::dwarf_data::{DwarfData, Error as DwarfError, Line};
 use crate::inferior::Inferior;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
@@ -42,6 +42,13 @@ impl Debugger {
         }
     }
 
+    pub fn dwarf_get_line_from_addr(&self, value: usize) -> Option<Line> {
+        self.debug_data.get_line_from_addr(value)
+    }
+    pub fn dwarf_get_function_from_addr(&self, value: usize) -> Option<String> {
+        self.debug_data.get_function_from_addr(value)
+    }
+
     pub fn run(&mut self) {
         loop {
             match self.get_next_command() {
@@ -68,7 +75,7 @@ impl Debugger {
                 }
                 DebuggerCommand::Backtrace => {
                     if let Some(inferior) = &self.inferior {
-                        inferior.print_backtrace(self.debug_data);
+                        inferior.print_backtrace(self);
                     } else {
                         eprintln!("Error backtracing");
                     }
