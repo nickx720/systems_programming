@@ -6,6 +6,7 @@ use std::os::unix::process::CommandExt;
 use std::process::{Child, Command};
 
 use crate::debugger::Debugger;
+use crate::dwarf_data::Line;
 
 pub enum Status {
     /// Indicates inferior stopped. Contains the signal that stopped the process, as well as the
@@ -97,15 +98,28 @@ impl Inferior {
         Ok(Status::Restart)
     }
 
-    pub fn print_backtrace(&self, debugger: &Debugger) -> Result<(), nix::Error> {
-        let regs = ptrace::getregs(self.pid())?;
-        let line_number = debugger.dwarf_get_line_from_addr(regs.rip as usize);
-        let file_name = debugger.dwarf_get_function_from_addr(regs.rip as usize);
+    fn print_function_line_no(line_number: Option<Line>, file_name: &Option<String>) {
         match (line_number, file_name) {
             (Some(line), Some(file)) => println!("{file} ({line})"),
             (None, None) => eprintln!("Nothing to show"),
             _ => unreachable!(),
         };
+    }
+
+    pub fn print_backtrace(&self, debugger: &Debugger) -> Result<(), nix::Error> {
+        let regs = ptrace::getregs(self.pid())?;
+        let (mut instruction_ptr, mut base_ptr) = (regs.rip as usize, regs.rbp as usize);
+        loop {
+            let line_number = debugger.dwarf_get_line_from_addr(instruction_ptr);
+            let file_name = debugger.dwarf_get_function_from_addr(instruction_ptr);
+            Inferior::print_function_line_no(line_number, &file_name);
+            if file_name.unwrap() == "main" {
+                break;
+            }
+            instruction_ptr =
+                ptrace::read(self.pid(), (base_ptr + 8) as ptrace::AddressType)? as usize;
+            base_ptr = ptrace::read(self.pid(), base_ptr as ptrace::AddressType)? as usize;
+        }
         Ok(())
     }
 }
