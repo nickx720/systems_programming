@@ -49,6 +49,11 @@ impl Debugger {
         self.debug_data.get_function_from_addr(value)
     }
 
+    pub fn dwarf_get_line_from_addr(value: usize) -> Option<Line> {
+        self.dwarf_get_line_from_addr(value);
+        todo!()
+    }
+
     pub fn run(&mut self) {
         loop {
             match self.get_next_command() {

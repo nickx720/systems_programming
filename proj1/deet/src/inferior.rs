@@ -6,6 +6,7 @@ use std::os::unix::process::CommandExt;
 use std::process::{Child, Command};
 
 use crate::debugger::Debugger;
+use crate::dwarf_data::DwarfData;
 use crate::dwarf_data::Line;
 
 pub enum Status {
@@ -89,7 +90,10 @@ impl Inferior {
         match status {
             Ok(resp) => match resp {
                 Status::Signaled(signal) => println!("{signal}"),
-                Status::Stopped(signal, _reg) => println!("Child stopped with (signal {signal})"),
+                Status::Stopped(signal, reg) => {
+                    eprintln!("Child stopped (signal {signal})");
+                    //                    let file_name = DwarfData::get_line_from_addr(reg.rip);
+                }
                 Status::Exited(code) => println!("Child Exited (status {code})"),
                 _ => eprint!("Paniced"),
             },
