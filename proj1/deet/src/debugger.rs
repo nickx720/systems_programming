@@ -1,6 +1,6 @@
 use crate::debugger_command::DebuggerCommand;
 use crate::dwarf_data::{DwarfData, Error as DwarfError, Line};
-use crate::inferior::Inferior;
+use crate::inferior::{Inferior, Status};
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
@@ -49,11 +49,6 @@ impl Debugger {
         self.debug_data.get_function_from_addr(value)
     }
 
-    pub fn dwarf_get_line_from_addr(value: usize) -> Option<Line> {
-        self.dwarf_get_line_from_addr(value);
-        todo!()
-    }
-
     pub fn run(&mut self) {
         loop {
             match self.get_next_command() {
@@ -61,6 +56,23 @@ impl Debugger {
                     if let Some(inferior) = Inferior::new(&self.target, &args) {
                         // Create the inferior
                         self.inferior = Some(inferior);
+                        if let Some(response) = &self.inferior {
+                            match response.wait(None) {
+                                Ok(resp) => match resp {
+                                    Status::Signaled(signal) => println!("{signal}"),
+                                    Status::Stopped(signal, reg) => {
+                                        eprintln!("Child stopped (signal {signal}) from inside");
+                                        //                    let file_name = DwarfData::get_line_from_addr(reg.rip);
+                                    }
+                                    Status::Exited(code) => {
+                                        println!("Child Exited (status {code})")
+                                    }
+                                    _ => eprint!("Paniced"),
+                                },
+                                Err(e) => eprint!("{e}"),
+                            }
+                        }
+                        println!("Completed first run");
                         // TODO (milestone 1): make the inferior run
                         // You may use self.inferior.as_mut().unwrap() to get a mutable reference
                         // to the Inferior object
