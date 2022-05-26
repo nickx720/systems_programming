@@ -6,7 +6,6 @@ use std::os::unix::process::CommandExt;
 use std::process::{Child, Command};
 
 use crate::debugger::Debugger;
-use crate::dwarf_data::DwarfData;
 use crate::dwarf_data::Line;
 
 pub enum Status {
