@@ -6,7 +6,6 @@ use std::os::unix::process::CommandExt;
 use std::process::{Child, Command};
 
 use crate::debugger::Debugger;
-use crate::dwarf_data::DwarfData;
 use crate::dwarf_data::Line;
 
 pub enum Status {
@@ -40,7 +39,8 @@ pub struct Inferior {
 impl Inferior {
     /// Attempts to start a new inferior process. Returns Some(Inferior) if successful, or None if
     /// an error is encountered.
-    pub fn new(target: &str, args: &Vec<String>) -> Option<Inferior> {
+    pub fn new(debugger: &Debugger, args: &Vec<String>) -> Option<Inferior> {
+        let target = debugger.get_target();
         let child_process = unsafe {
             let child_process = Command::new(target)
                 .args(args)
@@ -52,7 +52,7 @@ impl Inferior {
         let inferior = Inferior {
             child: child_process,
         };
-        let status = inferior.continue_exec();
+        let status = inferior.continue_exec(debugger);
         if status.is_ok() {
             return Some(inferior);
         } else {
@@ -84,7 +84,7 @@ impl Inferior {
     }
 
     /// Continue method
-    pub fn continue_exec(&self) -> Result<Status, nix::Error> {
+    pub fn continue_exec(&self, debugger: &Debugger) -> Result<Status, nix::Error> {
         ptrace::cont(self.pid(), None);
         let status = self.wait(None);
         match status {
@@ -92,7 +92,11 @@ impl Inferior {
                 Status::Signaled(signal) => println!("{signal}"),
                 Status::Stopped(signal, reg) => {
                     eprintln!("Child stopped (signal {signal})");
-                    //                    let file_name = DwarfData::get_line_from_addr(reg.rip);
+                    let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
+                        "Line
+                    not available",
+                    );
+                    eprintln!("Stopped at {file_name}");
                 }
                 Status::Exited(code) => println!("Child Exited (status {code})"),
                 _ => eprint!("Paniced"),
