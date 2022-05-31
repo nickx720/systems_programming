@@ -3,7 +3,7 @@ pub enum DebuggerCommand {
     Run(Vec<String>),
     Cont,
     Backtrace,
-    Break,
+    Break(String),
 }
 
 impl DebuggerCommand {
@@ -18,7 +18,14 @@ impl DebuggerCommand {
             }
             "c" | "cont" | "continue" => Some(DebuggerCommand::Cont),
             "bt" | "back" | "backtrace" => Some(DebuggerCommand::Backtrace),
-            "break" => Some(DebuggerCommand::Break),
+            "break" => {
+                let input = tokens[1].to_string();
+                if input.starts_with("*") {
+                    Some(DebuggerCommand::Break(input))
+                } else {
+                    None
+                }
+            }
             // Default case:
             _ => None,
         }
