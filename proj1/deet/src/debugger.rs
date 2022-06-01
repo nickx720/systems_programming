@@ -10,6 +10,7 @@ pub struct Debugger {
     readline: Editor<()>,
     inferior: Option<Inferior>,
     debug_data: DwarfData,
+    breakpoints: Vec<usize>,
 }
 
 impl Debugger {
@@ -39,6 +40,7 @@ impl Debugger {
             readline,
             inferior: None,
             debug_data,
+            breakpoints: vec![],
         }
     }
 
@@ -60,6 +62,9 @@ impl Debugger {
             &addr
         };
         usize::from_str_radix(addr_without_0x, 16).ok()
+    }
+    fn set_breakpoint(&mut self, breakpoint: usize) {
+        self.breakpoints.push(breakpoint);
     }
 
     pub fn run(&mut self) {
@@ -94,7 +99,9 @@ impl Debugger {
                     }
                 }
                 DebuggerCommand::Break(arg) => {
-                    let parsed_address = Self::parse_address(arg.as_str());
+                    if let Some(parsed_address) = Self::parse_address(arg.as_str()) {
+                        self.set_breakpoint(parsed_address);
+                    }
                     todo!()
                 }
             }
