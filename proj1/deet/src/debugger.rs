@@ -99,10 +99,13 @@ impl Debugger {
                     }
                 }
                 DebuggerCommand::Break(arg) => {
-                    if let Some(parsed_address) = Self::parse_address(arg.as_str()) {
+                    let remove_leading_star = arg.replace("*", "");
+                    if let Some(parsed_address) = Self::parse_address(&remove_leading_star) {
                         self.set_breakpoint(parsed_address);
+                        println!("Set breakpoint 0 at {arg}");
+                    } else {
+                        eprintln!("Error parsing");
                     }
-                    todo!()
                 }
             }
         }

@@ -18,7 +18,7 @@ impl DebuggerCommand {
             }
             "c" | "cont" | "continue" => Some(DebuggerCommand::Cont),
             "bt" | "back" | "backtrace" => Some(DebuggerCommand::Backtrace),
-            "break" => {
+            "break" | "b" => {
                 let input = tokens[1].to_string();
                 if input.starts_with("*") {
                     Some(DebuggerCommand::Break(input))
