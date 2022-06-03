@@ -2,6 +2,7 @@ use nix::sys::ptrace;
 use nix::sys::signal;
 use nix::sys::wait::{waitpid, WaitPidFlag, WaitStatus};
 use nix::unistd::Pid;
+use std::mem::size_of;
 use std::os::unix::process::CommandExt;
 use std::process::{Child, Command};
 
@@ -30,6 +31,10 @@ fn child_traceme() -> Result<(), std::io::Error> {
         std::io::ErrorKind::Other,
         "ptrace TRACEME failed",
     )))
+}
+
+fn align_addr_to_word(addr: usize) -> usize {
+    addr & (-(size_of::<usize>() as isize) as usize)
 }
 
 pub struct Inferior {
