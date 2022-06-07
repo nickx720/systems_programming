@@ -33,6 +33,7 @@ impl Debugger {
         let mut readline = Editor::<()>::new();
         // Attempt to load history from ~/.deet_history if it exists
         let _ = readline.load_history(&history_path);
+        //        debug_data.print();
 
         Debugger {
             target: target.to_string(),
