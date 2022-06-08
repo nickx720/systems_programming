@@ -33,7 +33,9 @@ impl Debugger {
         let mut readline = Editor::<()>::new();
         // Attempt to load history from ~/.deet_history if it exists
         let _ = readline.load_history(&history_path);
-        //        debug_data.print();
+
+        // Print all the breakpoints
+        debug_data.print();
 
         Debugger {
             target: target.to_string(),
@@ -64,8 +66,12 @@ impl Debugger {
         };
         usize::from_str_radix(addr_without_0x, 16).ok()
     }
-    fn set_breakpoint(&mut self, breakpoint: usize) {
+    pub fn set_breakpoint(&mut self, breakpoint: usize) {
         self.breakpoints.push(breakpoint);
+    }
+
+    pub fn get_breakpoint(&self) -> Vec<usize> {
+        self.breakpoints.clone()
     }
 
     pub fn run(&mut self) {

@@ -54,9 +54,14 @@ impl Inferior {
                 .expect(format!("{target} failed to execute process").as_str());
             child_process
         };
-        let inferior = Inferior {
+        let mut inferior = Inferior {
             child: child_process,
         };
+        let breakpoint = debugger.get_breakpoint();
+        if !breakpoint.is_empty() {
+            println!("I am here");
+            inferior.write_byte(breakpoint[0], 0u8);
+        }
         let status = inferior.continue_exec(debugger);
         if status.is_ok() {
             return Some(inferior);
@@ -96,6 +101,7 @@ impl Inferior {
             Ok(resp) => match resp {
                 Status::Signaled(signal) => println!("{signal}"),
                 Status::Stopped(signal, reg) => {
+                    // Setting up breakpoint
                     eprintln!("Child stopped (signal {signal})");
                     let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
                         "Line
