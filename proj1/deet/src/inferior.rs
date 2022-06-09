@@ -59,8 +59,9 @@ impl Inferior {
         };
         let breakpoint = debugger.get_breakpoint();
         if !breakpoint.is_empty() {
-            println!("I am here");
-            inferior.write_byte(breakpoint[0], 0u8);
+            for (index, &item) in breakpoint.iter().enumerate() {
+                inferior.write_byte(item, index as u8);
+            }
         }
         let status = inferior.continue_exec(debugger);
         if status.is_ok() {
