@@ -13,6 +13,12 @@ pub struct Debugger {
     breakpoints: Vec<usize>,
 }
 
+#[derive(Clone)]
+pub struct Breakpoint {
+    addr: usize,
+    orig_byte: u8,
+}
+
 impl Debugger {
     /// Initializes the debugger.
     pub fn new(target: &str) -> Debugger {
