@@ -64,9 +64,9 @@ impl Inferior {
             if !breakpoint.is_empty() {
                 for (index, &item) in breakpoint.iter().enumerate() {
                     let value = inferior
-                        .write_byte(item, index as u8)
+                        .write_byte(index, item as u8)
                         .expect("couldn't set breakpoint");
-                    println!("{value}")
+                    println!("{value}");
                 }
             }
             return Some(inferior);
