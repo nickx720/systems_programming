@@ -58,17 +58,16 @@ impl Inferior {
             child: child_process,
         };
         let breakpoint = debugger.get_breakpoint();
+        // When creating an Inferior, you should pass Inferior::new a list of breakpoints. In Inferior::new, after you wait for SIGTRAP (indicating that the inferior has fully loaded) but before returning, you should install these breakpoints in the child process.
+        if !breakpoint.is_empty() {
+            for (index, &item) in breakpoint.iter().enumerate() {
+                let value = inferior
+                    .write_byte(item, index as u8)
+                    .expect("couldn't set breakpoint");
+            }
+        }
         let status = inferior.continue_exec(debugger);
         if status.is_ok() {
-            // When creating an Inferior, you should pass Inferior::new a list of breakpoints. In Inferior::new, after you wait for SIGTRAP (indicating that the inferior has fully loaded) but before returning, you should install these breakpoints in the child process.
-            if !breakpoint.is_empty() {
-                for (index, &item) in breakpoint.iter().enumerate() {
-                    let value = inferior
-                        .write_byte(index, item as u8)
-                        .expect("couldn't set breakpoint");
-                    println!("{value}");
-                }
-            }
             return Some(inferior);
         } else {
             println!(
