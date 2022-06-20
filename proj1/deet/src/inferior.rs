@@ -106,9 +106,6 @@ impl Inferior {
                 Status::Signaled(signal) => println!("{signal}"),
                 Status::Stopped(signal, reg) => {
                     // Setting up breakpoint
-                    if signal == nix::sys::signal::SIGTRAP {
-                        println!("This is a sigtrap");
-                    }
                     eprintln!("Child stopped (signal {signal})");
                     let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
                         "Line
