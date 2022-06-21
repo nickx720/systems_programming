@@ -2,6 +2,7 @@ use nix::sys::ptrace;
 use nix::sys::signal;
 use nix::sys::wait::{waitpid, WaitPidFlag, WaitStatus};
 use nix::unistd::Pid;
+use std::collections::HashMap;
 use std::mem::size_of;
 use std::os::unix::process::CommandExt;
 use std::process::{Child, Command};
@@ -37,6 +38,12 @@ fn align_addr_to_word(addr: usize) -> usize {
     addr & (-(size_of::<usize>() as isize) as usize)
 }
 
+#[derive(Clone)]
+struct Breakpoint {
+    addr: usize,
+    orig_byte: u8,
+}
+
 pub struct Inferior {
     child: Child,
 }
@@ -57,6 +64,7 @@ impl Inferior {
         let mut inferior = Inferior {
             child: child_process,
         };
+        let list_of_breakpoints: HashMap<usize, Breakpoint> = HashMap::new();
         let breakpoint = debugger.get_breakpoint();
         // When creating an Inferior, you should pass Inferior::new a list of breakpoints. In Inferior::new, after you wait for SIGTRAP (indicating that the inferior has fully loaded) but before returning, you should install these breakpoints in the child process.
         if !breakpoint.is_empty() {

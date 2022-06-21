@@ -12,7 +12,7 @@ pub struct Debugger {
     readline: Editor<()>,
     inferior: Option<Inferior>,
     debug_data: DwarfData,
-    breakpoints: HashMap<usize, Breakpoint>,
+    breakpoints: Vec<usize>,
 }
 
 #[derive(Clone)]
