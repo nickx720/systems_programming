@@ -38,10 +38,15 @@ fn align_addr_to_word(addr: usize) -> usize {
     addr & (-(size_of::<usize>() as isize) as usize)
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Breakpoint {
     addr: usize,
     orig_byte: u8,
+}
+impl Breakpoint {
+    fn new(addr: usize, orig_byte: u8) -> Self {
+        Breakpoint { addr, orig_byte }
+    }
 }
 
 pub struct Inferior {
@@ -64,7 +69,7 @@ impl Inferior {
         let mut inferior = Inferior {
             child: child_process,
         };
-        let list_of_breakpoints: HashMap<usize, Breakpoint> = HashMap::new();
+        let mut list_of_breakpoints: HashMap<usize, Breakpoint> = HashMap::new();
         let breakpoint = debugger.get_breakpoint();
         // When creating an Inferior, you should pass Inferior::new a list of breakpoints. In Inferior::new, after you wait for SIGTRAP (indicating that the inferior has fully loaded) but before returning, you should install these breakpoints in the child process.
         if !breakpoint.is_empty() {
@@ -72,7 +77,10 @@ impl Inferior {
                 let value = inferior
                     .write_byte(item, index as u8)
                     .expect("couldn't set breakpoint");
+                let breakpoint = Breakpoint::new(item, value);
+                list_of_breakpoints.insert(index, breakpoint);
             }
+            dbg!(list_of_breakpoints);
         }
         let status = inferior.continue_exec(debugger);
         if status.is_ok() {
