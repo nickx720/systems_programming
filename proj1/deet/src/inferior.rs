@@ -49,6 +49,8 @@ impl Breakpoint {
     }
 }
 
+type BreakpointType = HashMap<usize, Breakpoint>;
+
 pub struct Inferior {
     child: Child,
 }
@@ -69,7 +71,7 @@ impl Inferior {
         let mut inferior = Inferior {
             child: child_process,
         };
-        let mut list_of_breakpoints: HashMap<usize, Breakpoint> = HashMap::new();
+        let mut list_of_breakpoints: BreakpointType = HashMap::new();
         let breakpoint = debugger.get_breakpoint();
         // When creating an Inferior, you should pass Inferior::new a list of breakpoints. In Inferior::new, after you wait for SIGTRAP (indicating that the inferior has fully loaded) but before returning, you should install these breakpoints in the child process.
         if !breakpoint.is_empty() {
@@ -80,9 +82,13 @@ impl Inferior {
                 let breakpoint = Breakpoint::new(item, value);
                 list_of_breakpoints.insert(index, breakpoint);
             }
-            dbg!(list_of_breakpoints);
         }
-        let status = inferior.continue_exec(debugger);
+        let mut status;
+        if list_of_breakpoints.is_empty() {
+            status = inferior.continues(debugger, None);
+        } else {
+            status = inferior.continues(debugger, Some(list_of_breakpoints));
+        }
         if status.is_ok() {
             return Some(inferior);
         } else {
@@ -122,7 +128,7 @@ impl Inferior {
                 Status::Signaled(signal) => println!("{signal}"),
                 Status::Stopped(signal, reg) => {
                     // Setting up breakpoint
-                    eprintln!("Child stopped (signal {signal})");
+                    eprintln!("Child stopped (signal {signal}{reg})");
                     let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
                         "Line
                     not available",
@@ -175,5 +181,13 @@ impl Inferior {
             updated_word as *mut std::ffi::c_void,
         )?;
         Ok(orig_byte as u8)
+    }
+
+    fn continues(
+        &self,
+        debugger: &Debugger,
+        breakpoint: Option<BreakpointType>,
+    ) -> Result<Status, nix::Error> {
+        self.continue_exec(debugger)
     }
 }
