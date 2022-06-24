@@ -39,7 +39,7 @@ fn align_addr_to_word(addr: usize) -> usize {
 }
 
 #[derive(Clone, Debug)]
-struct Breakpoint {
+pub struct Breakpoint {
     addr: usize,
     orig_byte: u8,
 }
@@ -128,7 +128,7 @@ impl Inferior {
                 Status::Signaled(signal) => println!("{signal}"),
                 Status::Stopped(signal, reg) => {
                     // Setting up breakpoint
-                    eprintln!("Child stopped (signal {signal}{reg})");
+                    eprintln!("Child stopped (signal {signal})");
                     let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
                         "Line
                     not available",
@@ -183,11 +183,16 @@ impl Inferior {
         Ok(orig_byte as u8)
     }
 
-    fn continues(
+    pub fn continues(
         &self,
         debugger: &Debugger,
         breakpoint: Option<BreakpointType>,
     ) -> Result<Status, nix::Error> {
-        self.continue_exec(debugger)
+        if breakpoint.is_some() {
+            println!("todo");
+            todo!()
+        } else {
+            self.continue_exec(debugger)
+        }
     }
 }
