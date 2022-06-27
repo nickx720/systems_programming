@@ -189,7 +189,10 @@ impl Inferior {
         breakpoint: Option<BreakpointType>,
     ) -> Result<Status, nix::Error> {
         if breakpoint.is_some() {
-            println!("todo");
+            let status = self.continue_exec(debugger);
+            if status.is_ok() {
+                println!("ptrace stopped at breakpoint");
+            }
             todo!()
         } else {
             self.continue_exec(debugger)
