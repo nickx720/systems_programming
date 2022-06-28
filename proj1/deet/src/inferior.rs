@@ -190,8 +190,18 @@ impl Inferior {
     ) -> Result<Status, nix::Error> {
         if breakpoint.is_some() {
             let status = self.continue_exec(debugger);
-            if status.is_ok() {
-                println!("ptrace stopped at breakpoint");
+            if let Ok(status_value) = status {
+                match status_value {
+                    Status::Stopped(status, pointer) => {
+                        println!("Here we are");
+                    }
+                    Status::Restart => {
+                        println!("Must restart");
+                    }
+                    _ => panic!("Illegal"),
+                }
+            } else {
+                eprintln!("Something went wrong with the status");
             }
             todo!()
         } else {
