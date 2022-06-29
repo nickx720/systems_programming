@@ -119,10 +119,7 @@ impl Inferior {
         })
     }
 
-    /// Continue method
-    pub fn continue_exec(&self, debugger: &Debugger) -> Result<Status, nix::Error> {
-        ptrace::cont(self.pid(), None);
-        let status = self.wait(None);
+    pub fn status_generator(&self, status: Result<Status, nix::Error>, debugger: &Debugger) {
         match status {
             Ok(resp) => match resp {
                 Status::Signaled(signal) => println!("{signal}"),
@@ -140,6 +137,13 @@ impl Inferior {
             },
             Err(e) => eprint!("{e}"),
         }
+    }
+
+    /// Continue method
+    pub fn continue_exec(&self, debugger: &Debugger) -> Result<Status, nix::Error> {
+        ptrace::cont(self.pid(), None);
+        let status = self.wait(None);
+        self.status_generator(status, debugger);
         Ok(Status::Restart)
     }
 
@@ -189,20 +193,23 @@ impl Inferior {
         breakpoint: Option<BreakpointType>,
     ) -> Result<Status, nix::Error> {
         if breakpoint.is_some() {
-            let status = self.continue_exec(debugger);
-            if let Ok(status_value) = status {
-                match status_value {
-                    Status::Stopped(status, pointer) => {
-                        println!("Here we are");
-                    }
-                    Status::Restart => {
-                        println!("Must restart");
-                    }
-                    _ => panic!("Illegal"),
-                }
-            } else {
-                eprintln!("Something went wrong with the status");
-            }
+            let status = self.wait(None);
+            self.status_generator(status, debugger);
+            //    match status {
+            //        Ok(resp) => match resp {
+            //            Status::Stopped(signal, reg) => {
+            //                // Setting up breakpoint
+            //                eprintln!("Child stopped (signal {signal}) in the alternative");
+            //                let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
+            //                    "Line
+            //            not available",
+            //                );
+            //                eprintln!("Stopped at {file_name}");
+            //            }
+            //            _ => eprint!("Paniced"),
+            //        },
+            //        Err(e) => eprint!("{e}"),
+            //    }
             todo!()
         } else {
             self.continue_exec(debugger)
