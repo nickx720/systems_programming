@@ -119,23 +119,42 @@ impl Inferior {
         })
     }
 
-    pub fn status_generator(&self, status: Result<Status, nix::Error>, debugger: &Debugger) {
+    pub fn status_generator(
+        &self,
+        status: Result<Status, nix::Error>,
+        debugger: &Debugger,
+    ) -> Result<Status, nix::Error> {
         match status {
             Ok(resp) => match resp {
-                Status::Signaled(signal) => println!("{signal}"),
+                Status::Signaled(signal) => {
+                    println!("{signal}");
+                    Ok(Status::Signaled(signal))
+                }
                 Status::Stopped(signal, reg) => {
                     // Setting up breakpoint
-                    eprintln!("Child stopped (signal {signal})");
-                    let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
-                        "Line
-                    not available",
-                    );
-                    eprintln!("Stopped at {file_name}");
+                    // alternate for both outputs
+                    Ok(Status::Stopped(signal, reg))
+                    //  eprintln!("Child stopped (signal {signal})");
+                    //  let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
+                    //      "Line
+                    //  not available",
+                    //  );
+                    //  eprintln!("Stopped at {file_name}");
+                    //  Ok(Status::Stopped(signal, reg))
                 }
-                Status::Exited(code) => println!("Child Exited (status {code})"),
-                _ => eprint!("Paniced"),
+                Status::Exited(code) => {
+                    println!("Child Exited (status {code})");
+                    Ok(Status::Exited(code))
+                }
+                _ => {
+                    eprint!("Paniced");
+                    Ok(Status::Restart)
+                }
             },
-            Err(e) => eprint!("{e}"),
+            Err(e) => {
+                eprint!("{e}");
+                Err(e)
+            }
         }
     }
 
@@ -194,22 +213,16 @@ impl Inferior {
     ) -> Result<Status, nix::Error> {
         if breakpoint.is_some() {
             let status = self.wait(None);
-            self.status_generator(status, debugger);
-            //    match status {
-            //        Ok(resp) => match resp {
-            //            Status::Stopped(signal, reg) => {
-            //                // Setting up breakpoint
-            //                eprintln!("Child stopped (signal {signal}) in the alternative");
-            //                let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
-            //                    "Line
-            //            not available",
-            //                );
-            //                eprintln!("Stopped at {file_name}");
-            //            }
-            //            _ => eprint!("Paniced"),
-            //        },
-            //        Err(e) => eprint!("{e}"),
-            //    }
+            let response_status = self.status_generator(status, debugger);
+            match response_status {
+                Ok(resp) => match resp {
+                    Status::Stopped(signal, value) => {
+                        println!("Something has stopped");
+                    }
+                    _ => panic!("shouldnot be here"),
+                },
+                _ => panic!("Something"),
+            }
             todo!()
         } else {
             self.continue_exec(debugger)
