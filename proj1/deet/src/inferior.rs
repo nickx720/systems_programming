@@ -133,14 +133,16 @@ impl Inferior {
                 Status::Stopped(signal, reg) => {
                     // Setting up breakpoint
                     // alternate for both outputs
-                    Ok(Status::Stopped(signal, reg))
-                    //  eprintln!("Child stopped (signal {signal})");
-                    //  let file_name = debugger.dwarf_get_line_from_addr(reg).expect(
-                    //      "Line
-                    //  not available",
-                    //  );
-                    //  eprintln!("Stopped at {file_name}");
-                    //  Ok(Status::Stopped(signal, reg))
+                    // Ok(Status::Stopped(signal, reg))
+                    eprintln!("Child stopped (signal {signal})");
+                    let file_name = debugger.dwarf_get_line_from_addr(reg);
+                    if file_name.is_some() {
+                        let file_name = file_name.expect("File name is missing");
+                        eprintln!("Stopped at {file_name}");
+                        Ok(Status::Stopped(signal, reg))
+                    } else {
+                        Ok(Status::Stopped(signal, reg))
+                    }
                 }
                 Status::Exited(code) => {
                     println!("Child Exited (status {code})");
