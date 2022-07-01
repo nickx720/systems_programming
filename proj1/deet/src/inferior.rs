@@ -219,13 +219,19 @@ impl Inferior {
             match response_status {
                 Ok(resp) => match resp {
                     Status::Stopped(signal, value) => {
-                        println!("Something has stopped");
+                        println!("Breakpoint at {signal}{value}");
+                        let response = ptrace::step(self.pid(), signal);
+                        if response.is_err() {
+                            eprintln!("It has stopped");
+                        } else {
+                            ptrace::cont(self.pid(), signal);
+                        }
                     }
                     _ => panic!("shouldnot be here"),
                 },
                 _ => panic!("Something"),
             }
-            todo!()
+            Ok(Status::Restart)
         } else {
             self.continue_exec(debugger)
         }
