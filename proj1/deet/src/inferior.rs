@@ -132,7 +132,6 @@ impl Inferior {
                 }
                 Status::Stopped(signal, reg) => {
                     // Setting up breakpoint
-                    // alternate for both outputs
                     // Ok(Status::Stopped(signal, reg))
                     eprintln!("Child stopped (signal {signal})");
                     let file_name = debugger.dwarf_get_line_from_addr(reg);
