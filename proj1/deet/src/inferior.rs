@@ -221,7 +221,7 @@ impl Inferior {
                         println!("Breakpoint at {signal}{value}");
                         let response = ptrace::step(self.pid(), signal);
                         if response.is_err() {
-                            eprintln!("It has stopped");
+                            eprintln!("Stopped due to {signal}");
                         } else {
                             ptrace::cont(self.pid(), signal);
                         }
