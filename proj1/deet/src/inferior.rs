@@ -212,7 +212,7 @@ impl Inferior {
         debugger: &Debugger,
         breakpoint: Option<BreakpointType>,
     ) -> Result<Status, nix::Error> {
-        if breakpoint.is_some() {
+        if let Some(breakpoint_value) = breakpoint {
             let status = self.wait(None);
             let response_status = self.status_generator(status, debugger);
             match response_status {
@@ -223,10 +223,11 @@ impl Inferior {
                         if response.is_err() {
                             eprintln!("Stopped due to {signal}");
                         } else {
-                            ptrace::cont(self.pid(), signal);
+                            let resume_pid = breakpoint_value.get(&value);
+                            if let (resume_pid) = resume_pid {}
                         }
                     }
-                    _ => panic!("shouldnot be here"),
+                    _ => ptrace::cont(self.pid(), None).expect("Continue failed"),
                 },
                 _ => panic!("Something"),
             }
