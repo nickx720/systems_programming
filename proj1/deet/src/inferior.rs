@@ -224,7 +224,9 @@ impl Inferior {
                             eprintln!("Stopped due to {signal}");
                         } else {
                             let resume_pid = breakpoint_value.get(&value);
-                            if let (resume_pid) = resume_pid {}
+                            if let Some(resume_pid) = resume_pid {
+                                println!("{}", resume_pid.addr);
+                            }
                         }
                     }
                     _ => ptrace::cont(self.pid(), None).expect("Continue failed"),
