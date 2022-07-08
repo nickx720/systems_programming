@@ -225,11 +225,14 @@ impl Inferior {
                         } else {
                             let resume_pid = breakpoint_value.get(&value);
                             if let Some(resume_pid) = resume_pid {
-                                println!("{}", resume_pid.addr);
+                                println!("Continue caused {}", resume_pid.addr);
                             }
                         }
                     }
-                    _ => ptrace::cont(self.pid(), None).expect("Continue failed"),
+                    _ => {
+                        dbg!("here we are");
+                        ptrace::cont(self.pid(), None).expect("Continue failed");
+                    }
                 },
                 _ => panic!("Something"),
             }
