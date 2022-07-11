@@ -219,6 +219,9 @@ impl Inferior {
                 Ok(resp) => match resp {
                     Status::Stopped(signal, value) => {
                         println!("Breakpoint at {signal}{value}");
+                        if signal == signal::Signal::SIGTRAP {
+                            dbg!("something is stopped");
+                        }
                         let response = ptrace::step(self.pid(), signal);
                         if response.is_err() {
                             eprintln!("Stopped due to {signal}");
