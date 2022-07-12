@@ -220,22 +220,22 @@ impl Inferior {
                     Status::Stopped(signal, value) => {
                         println!("Breakpoint at {signal}{value}");
                         if signal == signal::Signal::SIGTRAP {
-                            dbg!("something is stopped");
-                        }
-                        let response = ptrace::step(self.pid(), signal);
-                        if response.is_err() {
-                            eprintln!("Stopped due to {signal}");
-                        } else {
+                            // if inferior stopped at a breakpoint (i.e. (%rip - 1) matches a breakpoint address):    restore the first byte of the instruction we replaced    set %rip = %rip - 1 to rewind the instruction pointer
+                            dbg!("Something is paused");
                             let resume_pid = breakpoint_value.get(&value);
                             if let Some(resume_pid) = resume_pid {
                                 println!("Continue caused {}", resume_pid.addr);
                             }
+                            // ptrace::cont(self.pid(), None).expect("Continue failed");
+                        } else {
+                            let response = ptrace::step(self.pid(), signal);
+                            if response.is_err() {
+                                eprintln!("Stopped due to {signal}");
+                            } else {
+                            }
                         }
                     }
-                    _ => {
-                        dbg!("here we are");
-                        ptrace::cont(self.pid(), None).expect("Continue failed");
-                    }
+                    _ => todo!(),
                 },
                 _ => panic!("Something"),
             }
