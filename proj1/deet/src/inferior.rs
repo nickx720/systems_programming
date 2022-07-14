@@ -226,15 +226,21 @@ impl Inferior {
                             if let Some(resume_pid) = resume_pid {
                                 println!("Continue caused {}", resume_pid.addr);
                             } else {
-                                println!("Nothing found");
+                                let response = ptrace::step(self.pid(), signal);
+                                if response.is_err() {
+                                    eprintln!("Stopped due to {signal}");
+                                } else {
+                                    println!("Nothing found");
+                                }
                             }
                             // ptrace::cont(self.pid(), None).expect("Continue failed");
                         } else {
-                            let response = ptrace::step(self.pid(), signal);
-                            if response.is_err() {
-                                eprintln!("Stopped due to {signal}");
-                            } else {
-                            }
+                            ptrace::cont(self.pid(), None).expect("Continue failed");
+                            //  let response = ptrace::step(self.pid(), signal);
+                            //  if response.is_err() {
+                            //      eprintln!("Stopped due to {signal}");
+                            //  } else {
+                            //  }
                         }
                     }
                     _ => todo!(),
