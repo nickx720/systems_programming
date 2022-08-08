@@ -224,7 +224,7 @@ impl Inferior {
                             dbg!(&breakpoint_value, &value);
                             let resume_pid = breakpoint_value.get(&value);
                             if let Some(resume_pid) = resume_pid {
-                                println!("Continue caused due{}", resume_pid.addr);
+                                println!("Continue caused by{}", resume_pid.addr);
                             } else {
                                 let response = ptrace::step(self.pid(), signal);
                                 if response.is_err() {
