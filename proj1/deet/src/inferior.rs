@@ -222,25 +222,25 @@ impl Inferior {
                         if signal == signal::Signal::SIGTRAP {
                             // if inferior stopped at a breakpoint (i.e. (%rip - 1) matches a breakpoint address):    restore the first byte of the instruction we replaced    set %rip = %rip - 1 to rewind the instruction pointer
                             dbg!(&breakpoint_value, &value);
-                            let resume_pid = breakpoint_value.get(&value);
-                            if let Some(resume_pid) = resume_pid {
-                                println!("Continue caused by{}", resume_pid.addr);
-                            } else {
-                                let response = ptrace::step(self.pid(), signal);
-                                if response.is_err() {
-                                    eprintln!("Stopped due to {signal}");
+                            let response = ptrace::step(self.pid(), signal);
+                            if response.is_err() {
+                                eprintln!("Stopped due to {signal}");
+                                let resume_pid = breakpoint_value.get(&value);
+                                if let Some(resume_pid) = resume_pid {
+                                    println!("Continue caused by{}", resume_pid.addr);
                                 } else {
-                                    println!("Nothing found");
                                 }
+                                // ptrace::cont(self.pid(), None).expect("Continue failed");
+                            } else {
+                                ptrace::cont(self.pid(), None).expect("Continue failed");
+                                //  let response = ptrace::step(self.pid(), signal);
+                                //  if response.is_err() {
+                                //      eprintln!("Stopped due to {signal}");
+                                //  } else {
+                                //  }
                             }
-                            // ptrace::cont(self.pid(), None).expect("Continue failed");
                         } else {
-                            ptrace::cont(self.pid(), None).expect("Continue failed");
-                            //  let response = ptrace::step(self.pid(), signal);
-                            //  if response.is_err() {
-                            //      eprintln!("Stopped due to {signal}");
-                            //  } else {
-                            //  }
+                            println!("Nothing found");
                         }
                     }
                     _ => todo!(),
