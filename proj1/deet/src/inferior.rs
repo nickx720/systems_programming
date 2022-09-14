@@ -221,7 +221,7 @@ impl Inferior {
                         println!("Breakpoint at {signal}{value}");
                         if signal == signal::Signal::SIGTRAP {
                             // if inferior stopped at a breakpoint (i.e. (%rip - 1) matches a breakpoint address):    restore the first byte of the instruction we replaced    set %rip = %rip - 1 to rewind the instruction pointer
-                            dbg!(&breakpoint_value, &value);
+                            dbg!(&breakpoint_value, &value, &self.pid());
                             let response = ptrace::step(self.pid(), signal);
                             if response.is_err() {
                                 eprintln!("Stopped due to {signal}");
