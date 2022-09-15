@@ -116,6 +116,7 @@ impl Debugger {
                 DebuggerCommand::Break(arg) => {
                     let remove_leading_star = arg.replace("*", "");
                     if let Some(parsed_address) = Self::parse_address(&remove_leading_star) {
+                        dbg!(&parsed_address);
                         let count = self.get_breakpoint().len();
                         self.set_breakpoint(parsed_address);
 

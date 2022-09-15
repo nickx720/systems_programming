@@ -105,6 +105,10 @@ impl Inferior {
         nix::unistd::Pid::from_raw(self.child.id() as i32)
     }
 
+    pub fn increment_pid(&self) -> Pid {
+        nix::unistd::Pid::from_raw(self.child.id() as i32 + 1i32)
+    }
+
     /// Calls waitpid on this inferior and returns a Status to indicate the state of the process
     /// after the waitpid call.
     pub fn wait(&self, options: Option<WaitPidFlag>) -> Result<Status, nix::Error> {
@@ -222,7 +226,7 @@ impl Inferior {
                         if signal == signal::Signal::SIGTRAP {
                             // if inferior stopped at a breakpoint (i.e. (%rip - 1) matches a breakpoint address):    restore the first byte of the instruction we replaced    set %rip = %rip - 1 to rewind the instruction pointer
                             dbg!(&breakpoint_value, &value, &self.pid());
-                            let response = ptrace::step(self.pid(), signal);
+                            let response = ptrace::step(self.increment_pid(), signal);
                             if response.is_err() {
                                 eprintln!("Stopped due to {signal}");
                                 let resume_pid = breakpoint_value.get(&value);
