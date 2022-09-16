@@ -228,7 +228,7 @@ impl Inferior {
                             dbg!(&breakpoint_value, &value, &self.pid());
                             let response = ptrace::step(self.increment_pid(), signal);
                             if response.is_err() {
-                                eprintln!("Stopped due to {signal}");
+                                eprintln!("Child Stopped due to {signal}");
                                 let resume_pid = breakpoint_value.get(&value);
                                 if let Some(resume_pid) = resume_pid {
                                     println!("Continue caused by{}", resume_pid.addr);
