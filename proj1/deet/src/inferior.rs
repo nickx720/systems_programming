@@ -234,7 +234,6 @@ impl Inferior {
                                     println!("Continue caused by{}", resume_pid.addr);
                                 } else {
                                 }
-                                // ptrace::cont(self.pid(), None).expect("Continue failed");
                             } else {
                                 ptrace::cont(self.pid(), None).expect("Continue failed");
                                 //  let response = ptrace::step(self.pid(), signal);
