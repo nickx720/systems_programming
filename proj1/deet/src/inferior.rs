@@ -233,8 +233,8 @@ impl Inferior {
                                 if let Some(resume_pid) = resume_pid {
                                     println!("Continue caused by{}", resume_pid.addr);
                                 } else {
-                                    ptrace::cont(self.increment_pid(), None)
-                                        .expect("Continue failed");
+                                    println!("In this block");
+                                    ptrace::cont(self.pid(), None).expect("Continue failed");
                                 }
                             } else {
                                 println!("Shouldn't be here");
