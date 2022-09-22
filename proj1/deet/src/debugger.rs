@@ -101,7 +101,7 @@ impl Debugger {
                 }
                 DebuggerCommand::Cont => {
                     if let Some(inferior) = &self.inferior {
-                        inferior.continues(self, None);
+                        inferior.continue_exec(self);
                     } else {
                         println!("Error resuming process subprocess");
                     }
