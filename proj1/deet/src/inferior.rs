@@ -211,6 +211,10 @@ impl Inferior {
         Ok(orig_byte as u8)
     }
 
+    pub fn create_breakpoints() {
+        todo!()
+    }
+
     pub fn continues(
         &self,
         debugger: &Debugger,
