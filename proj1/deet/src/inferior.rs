@@ -71,18 +71,7 @@ impl Inferior {
         let mut inferior = Inferior {
             child: child_process,
         };
-        let mut list_of_breakpoints: BreakpointType = HashMap::new();
-        let breakpoint = debugger.get_breakpoint();
-        // When creating an Inferior, you should pass Inferior::new a list of breakpoints. In Inferior::new, after you wait for SIGTRAP (indicating that the inferior has fully loaded) but before returning, you should install these breakpoints in the child process.
-        if !breakpoint.is_empty() {
-            for (index, &item) in breakpoint.iter().enumerate() {
-                let value = inferior
-                    .write_byte(item, index as u8)
-                    .expect("couldn't set breakpoint");
-                let breakpoint = Breakpoint::new(item, value);
-                list_of_breakpoints.insert(index, breakpoint);
-            }
-        }
+        let list_of_breakpoints = create_breakpoints(debugger, &mut inferior);
         let mut status;
         if list_of_breakpoints.is_empty() {
             status = inferior.continues(debugger, None);
@@ -211,10 +200,6 @@ impl Inferior {
         Ok(orig_byte as u8)
     }
 
-    pub fn create_breakpoints() {
-        todo!()
-    }
-
     pub fn continues(
         &self,
         debugger: &Debugger,
@@ -261,4 +246,19 @@ impl Inferior {
             self.continue_exec(debugger)
         }
     }
+}
+pub fn create_breakpoints(debugger: &Debugger, inferior: &mut Inferior) -> BreakpointType {
+    let mut list_of_breakpoints: BreakpointType = HashMap::new();
+    let breakpoint = debugger.get_breakpoint();
+    // When creating an Inferior, you should pass Inferior::new a list of breakpoints. In Inferior::new, after you wait for SIGTRAP (indicating that the inferior has fully loaded) but before returning, you should install these breakpoints in the child process.
+    if !breakpoint.is_empty() {
+        for (index, &item) in breakpoint.iter().enumerate() {
+            let value = inferior
+                .write_byte(item, index as u8)
+                .expect("couldn't set breakpoint");
+            let breakpoint = Breakpoint::new(item, value);
+            list_of_breakpoints.insert(index, breakpoint);
+        }
+    }
+    list_of_breakpoints
 }
