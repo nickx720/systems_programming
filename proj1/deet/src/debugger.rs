@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::debugger_command::DebuggerCommand;
 use crate::dwarf_data::{DwarfData, Error as DwarfError, Line};
-use crate::inferior::Inferior;
+use crate::inferior::{create_breakpoints, Inferior};
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
@@ -100,8 +100,8 @@ impl Debugger {
                     return;
                 }
                 DebuggerCommand::Cont => {
-                    if let Some(inferior) = &self.inferior {
-                        inferior.continue_exec(self);
+                    if let Some(inferior) = &mut self.inferior {
+                        create_breakpoints(self, inferior);
                     } else {
                         println!("Error resuming process subprocess");
                     }
