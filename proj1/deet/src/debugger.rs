@@ -102,6 +102,7 @@ impl Debugger {
                 DebuggerCommand::Cont => {
                     if let Some(inferior) = &mut self.inferior {
                         create_breakpoints(self, inferior);
+                        // inferior.continue_exec(&self);
                     } else {
                         println!("Error resuming process subprocess");
                     }
