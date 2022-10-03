@@ -72,7 +72,7 @@ impl Inferior {
             child: child_process,
         };
         let list_of_breakpoints = create_breakpoints(debugger, &mut inferior);
-        let mut status;
+        let status;
         if list_of_breakpoints.is_empty() {
             status = inferior.continues(debugger, None);
         } else {

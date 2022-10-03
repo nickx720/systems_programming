@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::debugger_command::DebuggerCommand;
 use crate::dwarf_data::{DwarfData, Error as DwarfError, Line};
 use crate::inferior::{create_breakpoints, Inferior};
@@ -100,9 +98,9 @@ impl Debugger {
                     return;
                 }
                 DebuggerCommand::Cont => {
-                    if let Some(inferior) = &mut self.inferior {
-                        create_breakpoints(self, inferior);
-                        // inferior.continue_exec(&self);
+                    if let Some(inferior) = self.inferior {
+                        // create_breakpoints(self, inferior);
+                        inferior.continue_exec(&self);
                     } else {
                         println!("Error resuming process subprocess");
                     }
