@@ -98,9 +98,9 @@ impl Debugger {
                     return;
                 }
                 DebuggerCommand::Cont => {
-                    if let Some(inferior) = self.inferior {
+                    if let Some(inferior) = &self.inferior {
                         // create_breakpoints(self, inferior);
-                        inferior.continue_exec(&self);
+                        inferior.continues(&self);
                     } else {
                         println!("Error resuming process subprocess");
                     }

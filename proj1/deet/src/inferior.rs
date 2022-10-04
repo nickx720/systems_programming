@@ -53,6 +53,7 @@ type BreakpointType = HashMap<usize, Breakpoint>;
 
 pub struct Inferior {
     child: Child,
+    breakpoints: Option<BreakpointType>,
 }
 
 impl Inferior {
@@ -70,14 +71,11 @@ impl Inferior {
         };
         let mut inferior = Inferior {
             child: child_process,
+            breakpoints: None,
         };
         let list_of_breakpoints = create_breakpoints(debugger, &mut inferior);
-        let status;
-        if list_of_breakpoints.is_empty() {
-            status = inferior.continues(debugger, None);
-        } else {
-            status = inferior.continues(debugger, Some(list_of_breakpoints));
-        }
+        inferior.breakpoints = Some(list_of_breakpoints);
+        let status = inferior.continues(debugger);
         if status.is_ok() {
             return Some(inferior);
         } else {
@@ -200,12 +198,8 @@ impl Inferior {
         Ok(orig_byte as u8)
     }
 
-    pub fn continues(
-        &self,
-        debugger: &Debugger,
-        breakpoint: Option<BreakpointType>,
-    ) -> Result<Status, nix::Error> {
-        if let Some(breakpoint_value) = breakpoint {
+    pub fn continues(&self, debugger: &Debugger) -> Result<Status, nix::Error> {
+        if let Some(breakpoint_value) = &self.breakpoints {
             let status = self.wait(None);
             let response_status = self.status_generator(status, debugger);
             match response_status {
