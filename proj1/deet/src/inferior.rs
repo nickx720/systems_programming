@@ -40,17 +40,12 @@ fn align_addr_to_word(addr: usize) -> usize {
 
 #[derive(Clone, Debug)]
 pub struct Breakpoint {
-    pid: Pid,
     addr: usize,
     orig_byte: u8,
 }
 impl Breakpoint {
-    fn new(addr: usize, orig_byte: u8, pid: Pid) -> Self {
-        Breakpoint {
-            addr,
-            orig_byte,
-            pid,
-        }
+    fn new(addr: usize, orig_byte: u8) -> Self {
+        Breakpoint { addr, orig_byte }
     }
 }
 
@@ -255,7 +250,7 @@ pub fn create_breakpoints(debugger: &Debugger, inferior: &mut Inferior) -> Break
             let value = inferior
                 .write_byte(item, index as u8)
                 .expect("couldn't set breakpoint");
-            let breakpoint = Breakpoint::new(item, value, inferior.pid());
+            let breakpoint = Breakpoint::new(item, value);
             list_of_breakpoints.insert(index, breakpoint);
         }
     }
