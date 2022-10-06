@@ -1,6 +1,6 @@
 use crate::debugger_command::DebuggerCommand;
 use crate::dwarf_data::{DwarfData, Error as DwarfError, Line};
-use crate::inferior::{create_breakpoints, Inferior};
+use crate::inferior::Inferior;
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
