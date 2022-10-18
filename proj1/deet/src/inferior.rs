@@ -92,7 +92,7 @@ impl Inferior {
         nix::unistd::Pid::from_raw(self.child.id() as i32)
     }
 
-    pub fn create_pid(&self, value: usize) -> Pid {
+    pub fn create_pid(&self, value: u8) -> Pid {
         nix::unistd::Pid::from_raw(value as i32)
     }
     pub fn increment_pid(&self) -> Pid {
@@ -222,7 +222,7 @@ impl Inferior {
                                 } else {
                                     println!("In this block");
                                     let the_original_value = breakpoint_value.get(&0usize).unwrap();
-                                    let rip = self.create_pid(the_original_value.addr - 1);
+                                    let rip = self.create_pid(the_original_value.orig_byte);
                                     ptrace::cont(rip, None).expect("Continue failed");
                                 }
                             } else {
