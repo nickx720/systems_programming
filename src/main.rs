@@ -8,6 +8,6 @@ fn main() {
     // loop {
     //     run_shell();
     // }
-    // excercie();
-    cow_main();
+    excercie();
+    // cow_main();
 }

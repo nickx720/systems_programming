@@ -9,9 +9,29 @@ fn is_prime(num: u32) -> bool {
     if num <= 1 {
         return false;
     }
-    for factor in 2..((num as f64).squrt().floor() as u32) {
+    for factor in 2..((num as f64).sqrt().floor() as u32) {
         if num % factor == 0 {
             return false;
+        }
+    }
+    true
+}
+
+#[allow(dead_code)]
+fn factor_number(num: u32) {
+    let start = Instant::now();
+
+    if num == 1 || is_prime(num) {
+        println!("{} = {} [time: {:?}]", num, num, start.elapsed());
+        return;
+    }
+
+    let mut factors = Vec::new();
+    let mut curr_num = num;
+    for factor in 2..num {
+        while curr_num % factor == 0 {
+            factors.push(factor);
+            curr_num /= factor;
         }
     }
 }
