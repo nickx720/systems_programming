@@ -34,4 +34,11 @@ fn factor_number(num: u32) {
             curr_num /= factor;
         }
     }
+    factors.sort();
+    let factors_str = factors
+        .into_iter()
+        .map(|f| f.to_string())
+        .collect::<Vec<String>>()
+        .join(" * ");
+    println!("{} = {} [time: {:?}]", num, factors_str, start.elapsed());
 }
