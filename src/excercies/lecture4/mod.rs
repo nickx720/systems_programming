@@ -1,7 +1,10 @@
 // https://github.com/reberhardt7/cs110l-spr-2020-starter-code/blob/main/week5/farm/src/main.rs
+use num_cpus;
 use std::collections::VecDeque;
+#[allow(unused_imports)]
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
+#[allow(unused_imports)]
 use std::{env, process, thread};
 
 #[allow(dead_code)]
@@ -41,4 +44,18 @@ fn factor_number(num: u32) {
         .collect::<Vec<String>>()
         .join(" * ");
     println!("{} = {} [time: {:?}]", num, factors_str, start.elapsed());
+}
+
+#[allow(dead_code)]
+fn factor_prime_main() {
+    let num_threads = num_cpus::get();
+    println!("Farm starting on {} CPUs", num_threads);
+    let start = Instant::now();
+    // TODO: call get_input_numbers() and store a queue of numbers to factor
+
+    // TODO: spawn `num_threads` threads, each of which pops numbers off the queue and calls
+    // factor_number() until the queue is empty
+
+    // TODO: join all the threads you created
+    println!("Total execution time: {:?}", start.elapsed());
 }
