@@ -8,4 +8,5 @@ mod lecture4;
 // pub use lecture2::parttwo::rdiffmain as excercie;
 // pub use lecture2::rwcmain::rwcmain as excercie;
 // pub use lecture2::conway::main as excercie;
-pub use lecture3::linked_list::linkedmain as excercie;
+// pub use lecture3::linked_list::linkedmain as excercie;
+pub use lecture4::factor_prime_main as excercie;

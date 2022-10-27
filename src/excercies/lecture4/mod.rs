@@ -46,8 +46,9 @@ fn factor_number(num: u32) {
     println!("{} = {} [time: {:?}]", num, factors_str, start.elapsed());
 }
 
-#[allow(dead_code)]
-fn factor_prime_main() {
+pub fn factor_prime_main() {
+    let args: Vec<String> = env::args().collect();
+    dbg!(args);
     let num_threads = num_cpus::get();
     println!("Farm starting on {} CPUs", num_threads);
     let start = Instant::now();
