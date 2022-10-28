@@ -47,7 +47,11 @@ fn factor_number(num: u32) {
 }
 
 pub fn factor_prime_main() {
-    let args: Vec<String> = env::args().collect();
+    let args: Vec<u32> = env::args()
+        .skip(1)
+        .map(|item| item.parse::<u32>())
+        .filter_map(|item| item.ok())
+        .collect();
     dbg!(args);
     let num_threads = num_cpus::get();
     println!("Farm starting on {} CPUs", num_threads);
