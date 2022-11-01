@@ -49,9 +49,14 @@ fn factor_number(num: u32) {
 pub fn factor_prime_main() {
     let args: Vec<Vec<u32>> = env::args()
         .skip(1)
-        .map(|item| item.split("").collect::<Vec<&str>>())
+        .map(|item| {
+            item.split("")
+                .map(|item| item.to_owned())
+                .collect::<Vec<String>>()
+        })
         .map(|items| {
             items
+                .into_iter()
                 .map(|item| item.parse::<u32>())
                 .filter_map(|item| item.ok())
                 .collect::<Vec<u32>>()
