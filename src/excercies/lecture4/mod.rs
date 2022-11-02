@@ -46,8 +46,8 @@ fn factor_number(num: u32) {
     println!("{} = {} [time: {:?}]", num, factors_str, start.elapsed());
 }
 
-pub fn factor_prime_main() {
-    let args: Vec<Vec<u32>> = env::args()
+fn get_input_numbers() -> Vec<Vec<u32>> {
+    env::args()
         .skip(1)
         .map(|item| {
             item.split("")
@@ -61,11 +61,15 @@ pub fn factor_prime_main() {
                 .filter_map(|item| item.ok())
                 .collect::<Vec<u32>>()
         })
-        .collect();
-    dbg!(args);
+        .collect()
+}
+
+pub fn factor_prime_main() {
     let num_threads = num_cpus::get();
     println!("Farm starting on {} CPUs", num_threads);
     let start = Instant::now();
+    let input: Vec<Vec<u32>> = get_input_numbers();
+    dbg!(input);
     // TODO: call get_input_numbers() and store a queue of numbers to factor
 
     // TODO: spawn `num_threads` threads, each of which pops numbers off the queue and calls
