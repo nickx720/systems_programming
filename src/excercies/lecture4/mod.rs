@@ -70,9 +70,11 @@ pub fn factor_prime_main() {
     let start = Instant::now();
     let input: Vec<Vec<u32>> = get_input_numbers();
     dbg!(input);
-    // TODO: call get_input_numbers() and store a queue of numbers to factor
 
     // TODO: spawn `num_threads` threads, each of which pops numbers off the queue and calls
+    for item in 0..num_threads {
+        println!("{item}");
+    }
     // factor_number() until the queue is empty
 
     // TODO: join all the threads you created
