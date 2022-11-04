@@ -72,9 +72,12 @@ pub fn factor_prime_main() {
     dbg!(input);
 
     // TODO: spawn `num_threads` threads, each of which pops numbers off the queue and calls
-    for item in 0..num_threads {
-        println!("{item}");
-    }
+    thread::spawn(move || {
+        let threads = num_threads;
+        for item in 0..threads {
+            println!("{item}");
+        }
+    });
     // factor_number() until the queue is empty
 
     // TODO: join all the threads you created
