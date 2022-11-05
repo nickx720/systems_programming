@@ -69,12 +69,16 @@ pub fn factor_prime_main() {
     println!("Farm starting on {} CPUs", num_threads);
     let start = Instant::now();
     let input: Vec<Vec<u32>> = get_input_numbers();
-    dbg!(input);
 
     // TODO: spawn `num_threads` threads, each of which pops numbers off the queue and calls
     thread::spawn(move || {
         let threads = num_threads;
         for item in 0..threads {
+            for items in input {
+                for number in items {
+                    let number = factor_number(number);
+                }
+            }
             println!("{item}");
         }
     });
