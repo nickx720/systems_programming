@@ -74,9 +74,10 @@ pub fn factor_prime_main() {
     thread::spawn(move || {
         let threads = num_threads;
         for item in 0..threads {
-            for items in input {
-                for number in items {
-                    let number = factor_number(number);
+            for items in input.clone().into_iter() {
+                for number in items.into_iter() {
+                    let _ = factor_number(number);
+                    println!("{number}");
                 }
             }
             println!("{item}");
