@@ -71,18 +71,20 @@ pub fn factor_prime_main() {
     let input: Vec<Vec<u32>> = get_input_numbers();
 
     // TODO: spawn `num_threads` threads, each of which pops numbers off the queue and calls
-    thread::spawn(move || {
-        let threads = num_threads;
-        for item in 0..threads {
-            for items in input.clone().into_iter() {
-                for number in items.into_iter() {
+    let mut children = vec![];
+    let threads = num_threads;
+    for item in 0..threads {
+        for items in input.clone().into_iter() {
+            for number in items.into_iter() {
+                children.push(thread::spawn(move || {
                     let _ = factor_number(number);
-                    println!("{number}");
-                }
+                }))
             }
-            println!("{item}");
         }
-    });
+    }
+    for child in children {
+        let _ = child.join();
+    }
     // factor_number() until the queue is empty
 
     // TODO: join all the threads you created
