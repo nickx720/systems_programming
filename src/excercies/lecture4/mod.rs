@@ -46,38 +46,26 @@ fn factor_number(num: u32) {
     println!("{} = {} [time: {:?}]", num, factors_str, start.elapsed());
 }
 
-fn get_input_numbers() -> Vec<Vec<u32>> {
+fn get_input_numbers() -> Vec<u32> {
     env::args()
         .skip(1)
-        .map(|item| {
-            item.split("")
-                .map(|item| item.to_owned())
-                .collect::<Vec<String>>()
-        })
-        .map(|items| {
-            items
-                .into_iter()
-                .map(|item| item.parse::<u32>())
-                .filter_map(|item| item.ok())
-                .collect::<Vec<u32>>()
-        })
-        .collect()
+        .map(|item| item.parse::<u32>())
+        .filter_map(|item| item.ok())
+        .collect::<Vec<u32>>()
 }
 
 pub fn factor_prime_main() {
     let num_threads = num_cpus::get();
     println!("Farm starting on {} CPUs", num_threads);
     let start = Instant::now();
-    let input: Vec<Vec<u32>> = get_input_numbers();
+    let input: Vec<u32> = get_input_numbers();
 
     // TODO: spawn `num_threads` threads, each of which pops numbers off the queue and calls
     let mut children = vec![];
-    for items in input.clone().into_iter() {
-        for number in items.into_iter() {
-            children.push(thread::spawn(move || {
-                let _ = factor_number(number);
-            }))
-        }
+    for number in input.clone().into_iter() {
+        children.push(thread::spawn(move || {
+            let _ = factor_number(number);
+        }))
     }
     for child in children {
         let _ = child.join();
