@@ -2,6 +2,7 @@
 //mod lecture2;
 mod lecture3;
 mod lecture4;
+mod lecture5;
 //pub use lecture1::hangman::warhammer as lecture1;
 //pub use lecture1::add_n::add_n as lecture1;
 //pub use lecture2::partone::main_lecture2 as excercie;
@@ -9,4 +10,5 @@ mod lecture4;
 // pub use lecture2::rwcmain::rwcmain as excercie;
 // pub use lecture2::conway::main as excercie;
 // pub use lecture3::linked_list::linkedmain as excercie;
-pub use lecture4::factor_prime_main as excercie;
+//pub use lecture4::factor_prime_main as excercie;
+pub use lecture5::parallel_main as excercie;
