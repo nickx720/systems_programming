@@ -1,5 +1,5 @@
 use std::{thread, time};
-mod borrow;
+// mod borrow;
 fn parallel_map<T, U, F>(mut input_vec: Vec<T>, num_threads: usize, f: F) -> Vec<U>
 where
     F: FnOnce(T) -> U + Send + Copy + 'static,
@@ -8,11 +8,12 @@ where
 {
     let mut output_vec: Vec<U> = Vec::with_capacity(input_vec.len());
     // TODO: implement parallel map!
+    for id in 0..num_threads {}
     output_vec
 }
 
 pub fn parallel_main() {
-    borrow::borrow_main();
+    //  borrow::borrow_main();
     let v = vec![6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 12, 18, 11, 5, 20];
     let squares = parallel_map(v, 10, |num| {
         println!("{} squared is {}", num, num * num);
