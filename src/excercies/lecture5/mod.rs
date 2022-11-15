@@ -8,7 +8,9 @@ where
 {
     let mut output_vec: Vec<U> = Vec::with_capacity(input_vec.len());
     // TODO: implement parallel map!
-    for id in 0..num_threads {}
+    for id in 0..num_threads {
+        println!("{id}");
+    }
     output_vec
 }
 
