@@ -8,8 +8,11 @@ where
 {
     let mut output_vec: Vec<U> = Vec::with_capacity(input_vec.len());
     // TODO: implement parallel map!
+    let mut children = vec![];
     for id in 0..num_threads {
-        println!("{id}");
+        input_vec.iter().for_each(|&item| {
+            children.push(thread::spawn(move || item * item));
+        })
     }
     output_vec
 }
