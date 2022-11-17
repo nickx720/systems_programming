@@ -1,9 +1,9 @@
-use std::{thread, time};
+use std::{i32, thread, time};
 // mod borrow;
 fn parallel_map<T, U, F>(mut input_vec: Vec<T>, num_threads: usize, f: F) -> Vec<U>
 where
     F: FnOnce(T) -> U + Send + Copy + 'static,
-    T: Send + 'static,
+    T: Send + 'static + std::ops::Mul,
     U: Send + 'static + Default,
 {
     let mut output_vec: Vec<U> = Vec::with_capacity(input_vec.len());
