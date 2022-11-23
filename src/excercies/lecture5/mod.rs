@@ -1,4 +1,4 @@
-// https://www.youtube.com/watch?v=Xdo2Lc-nIUo
+// https://youtu.be/Xdo2Lc-nIUo?t=1317
 use std::{i32, thread, time};
 // mod borrow;
 fn parallel_map<T, U, F>(mut input_vec: Vec<T>, num_threads: usize, f: F) -> Vec<U>
