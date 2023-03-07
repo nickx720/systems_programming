@@ -4,7 +4,7 @@ use std::{i32, thread, time};
 fn parallel_map<T, U, F>(mut input_vec: Vec<T>, num_threads: usize, f: F) -> Vec<U>
 where
     F: FnOnce(T) -> U + Send + Copy + 'static,
-    T: Send + 'static + std::ops::Mul<Output = T> + Copy,
+    T: Send + 'static + std::ops::Mul<Output = T> + Copy + std::fmt::Debug,
     U: Send + 'static + Default,
 {
     let mut output_vec: Vec<U> = Vec::with_capacity(input_vec.len());
@@ -12,8 +12,11 @@ where
     let mut children = vec![];
     for id in 0..num_threads {
         input_vec.iter().for_each(|&item| {
-            children.push(thread::spawn(move || item * item));
+            children.push(thread::spawn(move || f(item)));
         })
+    }
+    for thread in children.into_iter() {
+        thread.join().unwrap();
     }
     output_vec
 }
