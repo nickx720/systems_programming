@@ -16,7 +16,8 @@ where
         })
     }
     for thread in children.into_iter() {
-        thread.join().unwrap();
+        let product = thread.join().unwrap();
+        output_vec.push(product);
     }
     output_vec
 }
