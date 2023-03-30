@@ -15,4 +15,4 @@ RUN mkdir src && touch src/main.rs && ./.cargo/bin/cargo build --release || true
 COPY balancebeam/ ./
 RUN ./.cargo/bin/cargo build --release
 
-ENTRYPOINT ["./.cargo/bin/cargo", "run", "--release", "--"]
+ENTRYPOINT ["./.cargo/bin/cargo", "run", "--release", "--", "--upstream","171.67.215.200:80"]
