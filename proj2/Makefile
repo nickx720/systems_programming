@@ -9,3 +9,6 @@ kill:
 
 remove:
 	docker rm proj2_container
+
+remove_build:
+	docker rmi -f proj2:latest
