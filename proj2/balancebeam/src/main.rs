@@ -3,8 +3,12 @@ mod response;
 
 use clap::Parser;
 use rand::{Rng, SeedableRng};
-use std::net::{TcpListener, TcpStream};
-use threadpool::ThreadPool;
+use std::{
+    net::{TcpListener, TcpStream},
+    thread::{JoinHandle, Thread},
+};
+//use threadpool::ThreadPool;
+use std::thread;
 
 /// Contains information parsed from the command-line invocation of balancebeam. The Clap macros
 /// provide a fancy way to automatically construct a command-line argument parser.
@@ -93,16 +97,29 @@ fn main() {
         max_requests_per_minute: options.max_requests_per_minute,
     };
 
-    let n_workers = 4;
-    let pool = ThreadPool::new(n_workers);
+    //    let n_workers = 4;
+    //    let pool = ThreadPool::new(n_workers);
+    //    for stream in listener.incoming() {
+    //        if let Ok(stream) = stream {
+    //            // Handle the connection!
+    //            let state = state.clone();
+    //            pool.execute(move || {
+    //                handle_connection(stream, &state);
+    //            })
+    //        }
+    //    }
+    let mut threads: Vec<JoinHandle<()>> = Vec::new();
     for stream in listener.incoming() {
         if let Ok(stream) = stream {
-            // Handle the connection!
             let state = state.clone();
-            pool.execute(move || {
+            let thread = thread::spawn(move || {
                 handle_connection(stream, &state);
-            })
+            });
+            threads.push(thread);
         }
+    }
+    for thread in threads {
+        thread.join().unwrap();
     }
 }
 
