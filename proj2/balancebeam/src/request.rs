@@ -1,6 +1,8 @@
 use std::cmp::min;
-use std::io::{Read, Write};
-use std::net::TcpStream;
+//use std::io::{Read, Write};
+//use std::net::TcpStream;
+use tokio::io::{AsyncReadExt as Read, AsyncWriteExt as Write};
+use tokio::net::TcpStream;
 
 const MAX_HEADERS_SIZE: usize = 8000;
 const MAX_BODY_SIZE: usize = 10000000;
