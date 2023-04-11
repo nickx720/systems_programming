@@ -141,7 +141,7 @@ fn read_headers(stream: &mut TcpStream) -> Result<http::Request<Vec<u8>>, Error>
 /// returns Ok(()) if successful, or Err(Error) if Content-Length bytes couldn't be read.
 ///
 /// You will need to modify this function in Milestone 2.
-fn read_body(
+async fn read_body(
     stream: &mut TcpStream,
     request: &mut http::Request<Vec<u8>>,
     content_length: usize,
@@ -153,6 +153,7 @@ fn read_body(
         let mut buffer = vec![0_u8; min(512, content_length)];
         let bytes_read = stream
             .read(&mut buffer)
+            .await
             .or_else(|err| Err(Error::ConnectionError(err)))?;
 
         // Make sure the client is still sending us bytes
