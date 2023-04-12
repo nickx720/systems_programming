@@ -185,7 +185,7 @@ async fn read_body(
 /// closes the connection prematurely or sends an invalid request.
 ///
 /// You will need to modify this function in Milestone 2.
-pub fn read_from_stream(stream: &mut TcpStream) -> Result<http::Request<Vec<u8>>, Error> {
+pub async fn read_from_stream(stream: &mut TcpStream) -> Result<http::Request<Vec<u8>>, Error> {
     // Read headers
     let mut request = read_headers(stream)?;
     // Read body if the client supplied the Content-Length header (which it does for POST requests)
@@ -193,7 +193,7 @@ pub fn read_from_stream(stream: &mut TcpStream) -> Result<http::Request<Vec<u8>>
         if content_length > MAX_BODY_SIZE {
             return Err(Error::RequestBodyTooLarge);
         } else {
-            read_body(stream, &mut request, content_length)?;
+            read_body(stream, &mut request, content_length).await?;
         }
     }
     Ok(request)
