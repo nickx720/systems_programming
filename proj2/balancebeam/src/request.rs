@@ -105,7 +105,7 @@ fn parse_request(buffer: &[u8]) -> Result<Option<(http::Request<Vec<u8>>, usize)
 /// Returns Ok(http::Request) if a valid request is received, or Error if not.
 ///
 /// You will need to modify this function in Milestone 2.
-fn read_headers(stream: &mut TcpStream) -> Result<http::Request<Vec<u8>>, Error> {
+async fn read_headers(stream: &mut TcpStream) -> Result<http::Request<Vec<u8>>, Error> {
     // Try reading the headers from the request. We may not receive all the headers in one shot
     // (e.g. we might receive the first few bytes of a request, and then the rest follows later).
     // Try parsing repeatedly until we read a valid HTTP request
@@ -115,6 +115,7 @@ fn read_headers(stream: &mut TcpStream) -> Result<http::Request<Vec<u8>>, Error>
         // Read bytes from the connection into the buffer, starting at position bytes_read
         let new_bytes = stream
             .read(&mut request_buffer[bytes_read..])
+            .await
             .or_else(|err| Err(Error::ConnectionError(err)))?;
         if new_bytes == 0 {
             // We didn't manage to read a complete request
@@ -187,7 +188,7 @@ async fn read_body(
 /// You will need to modify this function in Milestone 2.
 pub async fn read_from_stream(stream: &mut TcpStream) -> Result<http::Request<Vec<u8>>, Error> {
     // Read headers
-    let mut request = read_headers(stream)?;
+    let mut request = read_headers(stream).await?;
     // Read body if the client supplied the Content-Length header (which it does for POST requests)
     if let Some(content_length) = get_content_length(&request)? {
         if content_length > MAX_BODY_SIZE {
@@ -202,20 +203,24 @@ pub async fn read_from_stream(stream: &mut TcpStream) -> Result<http::Request<Ve
 /// This function serializes a request to bytes and writes those bytes to the provided stream.
 ///
 /// You will need to modify this function in Milestone 2.
-pub fn write_to_stream(
+pub async fn write_to_stream(
     request: &http::Request<Vec<u8>>,
     stream: &mut TcpStream,
 ) -> Result<(), std::io::Error> {
-    stream.write(&format_request_line(request).into_bytes())?;
-    stream.write(&['\r' as u8, '\n' as u8])?; // \r\n
+    stream
+        .write_all(&format_request_line(request).into_bytes())
+        .await?;
+    stream.write_all(&['\r' as u8, '\n' as u8]).await?; // \r\n
     for (header_name, header_value) in request.headers() {
-        stream.write(&format!("{}: ", header_name).as_bytes())?;
-        stream.write(header_value.as_bytes())?;
-        stream.write(&['\r' as u8, '\n' as u8])?; // \r\n
+        stream
+            .write_all(&format!("{}: ", header_name).as_bytes())
+            .await?;
+        stream.write_all(header_value.as_bytes()).await?;
+        stream.write_all(&['\r' as u8, '\n' as u8]).await?; // \r\n
     }
-    stream.write(&['\r' as u8, '\n' as u8])?;
+    stream.write_all(&['\r' as u8, '\n' as u8]).await?;
     if request.body().len() > 0 {
-        stream.write(request.body())?;
+        stream.write_all(request.body()).await?;
     }
     Ok(())
 }
