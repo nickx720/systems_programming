@@ -4,11 +4,12 @@ mod response;
 use clap::Parser;
 use rand::{Rng, SeedableRng};
 use std::{
-    net::{TcpListener, TcpStream},
+    net::TcpListener,
     thread::{JoinHandle, Thread},
 };
 //use threadpool::ThreadPool;
 use std::thread;
+use tokio::net::TcpStream;
 
 /// Contains information parsed from the command-line invocation of balancebeam. The Clap macros
 /// provide a fancy way to automatically construct a command-line argument parser.
@@ -147,7 +148,7 @@ fn send_response(client_conn: &mut TcpStream, response: &http::Response<Vec<u8>>
     }
 }
 
-fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
+async fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
     let client_ip = client_conn.peer_addr().unwrap().ip().to_string();
     log::info!("Connection received from {}", client_ip);
 
@@ -166,7 +167,7 @@ fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
     // client hangs up or we get an error.
     loop {
         // Read a request from the client
-        let mut request = match request::read_from_stream(&mut client_conn) {
+        let mut request = match request::read_from_stream(&mut client_conn).await {
             Ok(request) => request,
             // Handle case where client closed connection and is no longer sending requests
             Err(request::Error::IncompleteRequest(0)) => {
