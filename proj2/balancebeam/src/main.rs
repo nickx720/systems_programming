@@ -3,13 +3,10 @@ mod response;
 
 use clap::Parser;
 use rand::{Rng, SeedableRng};
-use std::{
-    net::TcpListener,
-    thread::{JoinHandle, Thread},
-};
+use std::thread::{JoinHandle, Thread};
 //use threadpool::ThreadPool;
 use std::thread;
-use tokio::net::TcpStream;
+use tokio::net::{TcpListener, TcpStream};
 
 /// Contains information parsed from the command-line invocation of balancebeam. The Clap macros
 /// provide a fancy way to automatically construct a command-line argument parser.
@@ -64,7 +61,8 @@ struct ProxyState {
     upstream_addresses: Vec<String>,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // Initialize the logging library. You can print log messages using the `log` macros:
     // https://docs.rs/log/0.4.8/log/ You are welcome to continue using print! statements; this
     // just looks a little prettier.
@@ -81,7 +79,7 @@ fn main() {
     }
 
     // Start listening for connections
-    let listener = match TcpListener::bind(&options.bind) {
+    let listener = match TcpListener::bind(&options.bind).await {
         Ok(listener) => listener,
         Err(err) => {
             log::error!("Could not bind to {}: {}", options.bind, err);
@@ -124,25 +122,25 @@ fn main() {
     }
 }
 
-fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::Error> {
+async fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::Error> {
     let mut rng = rand::rngs::StdRng::from_entropy();
     let upstream_idx = rng.gen_range(0, state.upstream_addresses.len());
     let upstream_ip = &state.upstream_addresses[upstream_idx];
-    TcpStream::connect(upstream_ip).or_else(|err| {
+    TcpStream::connect(upstream_ip).await.or_else(|err| {
         log::error!("Failed to connect to upstream {}: {}", upstream_ip, err);
         Err(err)
     })
     // TODO: implement failover (milestone 3)
 }
 
-fn send_response(client_conn: &mut TcpStream, response: &http::Response<Vec<u8>>) {
+async fn send_response(client_conn: &mut TcpStream, response: &http::Response<Vec<u8>>) {
     let client_ip = client_conn.peer_addr().unwrap().ip().to_string();
     log::info!(
         "{} <- {}",
         client_ip,
         response::format_response_line(&response)
     );
-    if let Err(error) = response::write_to_stream(&response, client_conn) {
+    if let Err(error) = response::write_to_stream(&response, client_conn).await {
         log::warn!("Failed to send response to client: {}", error);
         return;
     }
@@ -153,7 +151,7 @@ async fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
     log::info!("Connection received from {}", client_ip);
 
     // Open a connection to a random destination server
-    let mut upstream_conn = match connect_to_upstream(state) {
+    let mut upstream_conn = match connect_to_upstream(state).await {
         Ok(stream) => stream,
         Err(_error) => {
             let response = response::make_http_error(http::StatusCode::BAD_GATEWAY);
