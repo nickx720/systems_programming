@@ -204,7 +204,7 @@ async fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
         request::extend_header_value(&mut request, "x-forwarded-for", &client_ip);
 
         // Forward the request to the server
-        if let Err(error) = request::write_to_stream(&request, &mut upstream_conn) {
+        if let Err(error) = request::write_to_stream(&request, &mut upstream_conn).await {
             log::error!(
                 "Failed to send request to upstream {}: {}",
                 upstream_ip,
