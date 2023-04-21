@@ -7,6 +7,7 @@ use std::thread::{JoinHandle, Thread};
 //use threadpool::ThreadPool;
 use std::thread;
 use tokio::net::{TcpListener, TcpStream};
+use tokio::stream::StreamExt;
 
 /// Contains information parsed from the command-line invocation of balancebeam. The Clap macros
 /// provide a fancy way to automatically construct a command-line argument parser.
@@ -79,7 +80,7 @@ async fn main() {
     }
 
     // Start listening for connections
-    let listener = match TcpListener::bind(&options.bind).await {
+    let mut listener = match TcpListener::bind(&options.bind).await {
         Ok(listener) => listener,
         Err(err) => {
             log::error!("Could not bind to {}: {}", options.bind, err);
@@ -108,18 +109,27 @@ async fn main() {
     //        }
     //    }
     let mut threads: Vec<JoinHandle<()>> = Vec::new();
-    for stream in listener.incoming() {
-        if let Ok(stream) = stream {
-            let state = state.clone();
-            let thread = thread::spawn(move || {
-                handle_connection(stream, &state);
-            });
-            threads.push(thread);
+    while let Some(stream) = listener.next().await {
+        match stream {
+            Ok(stream) => {
+                println!("new client!");
+            }
+            Err(e) => { /* connection failed */ }
         }
     }
-    for thread in threads {
-        thread.join().unwrap();
-    }
+
+    //  for stream in listener.incoming() {
+    //      if let Ok(stream) = stream {
+    //          let state = state.clone();
+    //          let thread = thread::spawn(move || {
+    //              handle_connection(stream, &state);
+    //          });
+    //          threads.push(thread);
+    //      }
+    //  }
+    //  for thread in threads {
+    //      thread.join().unwrap();
+    //  }
 }
 
 async fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::Error> {
@@ -217,7 +227,8 @@ async fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
         log::debug!("Forwarded request to server");
 
         // Read the server's response
-        let response = match response::read_from_stream(&mut upstream_conn, request.method()) {
+        let response = match response::read_from_stream(&mut upstream_conn, request.method()).await
+        {
             Ok(response) => response,
             Err(error) => {
                 log::error!("Error reading response from server: {:?}", error);
