@@ -113,8 +113,21 @@ async fn main() {
         match stream {
             Ok(stream) => {
                 println!("new client!");
+                let state = state.clone();
+                let thread = thread::spawn(move || {
+                    handle_connection(stream, &state);
+                });
+                threads.push(thread);
             }
-            Err(e) => { /* connection failed */ }
+            Err(e) => {
+                /* connection failed */
+                if let Some(inner_error) = e.into_inner() {
+                    println!("Inner error: {inner_error}");
+                } else {
+                    println!("No inner error");
+                }
+                panic!("Something went wrong")
+            }
         }
     }
 
@@ -127,9 +140,9 @@ async fn main() {
     //          threads.push(thread);
     //      }
     //  }
-    //  for thread in threads {
-    //      thread.join().unwrap();
-    //  }
+    for thread in threads {
+        thread.join().unwrap();
+    }
 }
 
 async fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::Error> {
