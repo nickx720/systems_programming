@@ -3,9 +3,8 @@ mod response;
 
 use clap::Parser;
 use rand::{Rng, SeedableRng};
-use std::thread::{JoinHandle, Thread};
-//use threadpool::ThreadPool;
-use std::thread;
+//use std::thread::{JoinHandle, Thread};
+use threadpool::ThreadPool;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::stream::StreamExt;
 
@@ -108,16 +107,14 @@ async fn main() {
     //            })
     //        }
     //    }
-    let mut threads: Vec<JoinHandle<()>> = Vec::new();
+    let n_workers = 4;
+    let pool = ThreadPool::new(n_workers);
     while let Some(stream) = listener.next().await {
         match stream {
             Ok(stream) => {
                 println!("new client!");
                 let state = state.clone();
-                let thread = thread::spawn(move || {
-                    handle_connection(stream, &state);
-                });
-                threads.push(thread);
+                handle_connection(stream, &state).await;
             }
             Err(e) => {
                 /* connection failed */
@@ -129,19 +126,6 @@ async fn main() {
                 panic!("Something went wrong")
             }
         }
-    }
-
-    //  for stream in listener.incoming() {
-    //      if let Ok(stream) = stream {
-    //          let state = state.clone();
-    //          let thread = thread::spawn(move || {
-    //              handle_connection(stream, &state);
-    //          });
-    //          threads.push(thread);
-    //      }
-    //  }
-    for thread in threads {
-        thread.join().unwrap();
     }
 }
 
