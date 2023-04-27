@@ -3,7 +3,7 @@ mod response;
 
 use clap::Parser;
 use rand::{Rng, SeedableRng};
-//use std::thread::{JoinHandle, Thread};
+use std::thread::{JoinHandle, Thread};
 use threadpool::ThreadPool;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::stream::StreamExt;
@@ -114,7 +114,6 @@ async fn main() {
             Ok(stream) => {
                 println!("new client!");
                 let state = state.clone();
-                handle_connection(stream, &state).await;
             }
             Err(e) => {
                 /* connection failed */
@@ -127,6 +126,7 @@ async fn main() {
             }
         }
     }
+    //https://stackoverflow.com/questions/61292425/how-to-run-an-asynchronous-task-from-a-non-main-thread-in-tokio
 }
 
 async fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::Error> {
