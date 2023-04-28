@@ -107,8 +107,8 @@ async fn main() {
     //            })
     //        }
     //    }
-    let n_workers = 4;
-    let pool = ThreadPool::new(n_workers);
+    //    let n_workers = 4;
+    //    let pool = ThreadPool::new(n_workers);
     while let Some(stream) = listener.next().await {
         match stream {
             Ok(stream) => {
