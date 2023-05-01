@@ -108,9 +108,11 @@ async fn main() {
     //            })
     //        }
     //    }
+
     // let n_workers = 4;
     // let pool = ThreadPool::new(n_workers);
     let mut threads: Vec<_> = Vec::new();
+
     while let Some(stream) = listener.next().await {
         match stream {
             Ok(stream) => {
