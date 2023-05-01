@@ -3,8 +3,9 @@ mod response;
 
 use clap::Parser;
 use rand::{Rng, SeedableRng};
+use std::thread;
 use std::thread::{JoinHandle, Thread};
-use threadpool::ThreadPool;
+//use threadpool::ThreadPool;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::stream::StreamExt;
 
@@ -107,13 +108,17 @@ async fn main() {
     //            })
     //        }
     //    }
-    let n_workers = 4;
-    let pool = ThreadPool::new(n_workers);
+    // let n_workers = 4;
+    // let pool = ThreadPool::new(n_workers);
+    let mut threads: Vec<_> = Vec::new();
     while let Some(stream) = listener.next().await {
         match stream {
             Ok(stream) => {
                 println!("new client!");
                 let state = state.clone();
+                let thread = thread::spawn(move || {
+                    handle_connection(stream, &state);
+                });
             }
             Err(e) => {
                 /* connection failed */
@@ -126,6 +131,7 @@ async fn main() {
             }
         }
     }
+
     //https://stackoverflow.com/questions/61292425/how-to-run-an-asynchronous-task-from-a-non-main-thread-in-tokio
 }
 
