@@ -7,6 +7,7 @@ use std::thread;
 use std::thread::{JoinHandle, Thread};
 //use threadpool::ThreadPool;
 use tokio::net::{TcpListener, TcpStream};
+use tokio::runtime::Handle;
 use tokio::stream::StreamExt;
 
 /// Contains information parsed from the command-line invocation of balancebeam. The Clap macros
@@ -118,9 +119,13 @@ async fn main() {
             Ok(stream) => {
                 println!("new client!");
                 let state = state.clone();
+                let handle = Handle::current();
                 let thread = thread::spawn(move || {
-                    handle_connection(stream, &state);
+                    handle.spawn(async move {
+                        handle_connection(stream, &state).await;
+                    })
                 });
+                threads.push(thread);
             }
             Err(e) => {
                 /* connection failed */
