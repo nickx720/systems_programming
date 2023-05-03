@@ -139,6 +139,10 @@ async fn main() {
         }
     }
 
+    for item in threads {
+        item.join().expect("Thread panicked");
+    }
+
     //https://stackoverflow.com/questions/61292425/how-to-run-an-asynchronous-task-from-a-non-main-thread-in-tokio
 }
 
@@ -175,7 +179,7 @@ async fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
         Ok(stream) => stream,
         Err(_error) => {
             let response = response::make_http_error(http::StatusCode::BAD_GATEWAY);
-            send_response(&mut client_conn, &response);
+            send_response(&mut client_conn, &response).await;
             return;
         }
     };
@@ -207,7 +211,7 @@ async fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
                     request::Error::RequestBodyTooLarge => http::StatusCode::PAYLOAD_TOO_LARGE,
                     request::Error::ConnectionError(_) => http::StatusCode::SERVICE_UNAVAILABLE,
                 });
-                send_response(&mut client_conn, &response);
+                send_response(&mut client_conn, &response).await;
                 continue;
             }
         };
@@ -231,7 +235,7 @@ async fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
                 error
             );
             let response = response::make_http_error(http::StatusCode::BAD_GATEWAY);
-            send_response(&mut client_conn, &response);
+            send_response(&mut client_conn, &response).await;
             return;
         }
         log::debug!("Forwarded request to server");
@@ -243,12 +247,12 @@ async fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
             Err(error) => {
                 log::error!("Error reading response from server: {:?}", error);
                 let response = response::make_http_error(http::StatusCode::BAD_GATEWAY);
-                send_response(&mut client_conn, &response);
+                send_response(&mut client_conn, &response).await;
                 return;
             }
         };
         // Forward the response to the client
-        send_response(&mut client_conn, &response);
+        send_response(&mut client_conn, &response).await;
         log::debug!("Forwarded response to client");
     }
 }
