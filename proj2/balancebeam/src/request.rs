@@ -209,18 +209,35 @@ pub async fn write_to_stream(
 ) -> Result<(), std::io::Error> {
     stream
         .write_all(&format_request_line(request).into_bytes())
-        .await?;
-    stream.write_all(&['\r' as u8, '\n' as u8]).await?; // \r\n
+        .await
+        .expect("Couldn't write");
+    stream
+        .write_all(&['\r' as u8, '\n' as u8])
+        .await
+        .expect("Couldn't write"); // \r\n
     for (header_name, header_value) in request.headers() {
         stream
             .write_all(&format!("{}: ", header_name).as_bytes())
-            .await?;
-        stream.write_all(header_value.as_bytes()).await?;
-        stream.write_all(&['\r' as u8, '\n' as u8]).await?; // \r\n
+            .await
+            .expect("Couldn't write");
+        stream
+            .write_all(header_value.as_bytes())
+            .await
+            .expect("Couldn't write");
+        stream
+            .write_all(&['\r' as u8, '\n' as u8])
+            .await
+            .expect("Couldn't write"); // \r\n
     }
-    stream.write_all(&['\r' as u8, '\n' as u8]).await?;
+    stream
+        .write_all(&['\r' as u8, '\n' as u8])
+        .await
+        .expect("Couldn't write");
     if request.body().len() > 0 {
-        stream.write_all(request.body()).await?;
+        stream
+            .write_all(request.body())
+            .await
+            .expect("Couldn't write");
     }
     Ok(())
 }
