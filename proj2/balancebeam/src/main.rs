@@ -98,20 +98,6 @@ async fn main() {
         max_requests_per_minute: options.max_requests_per_minute,
     };
 
-    //    let n_workers = 4;
-    //    let pool = ThreadPool::new(n_workers);
-    //    for stream in listener.incoming() {
-    //        if let Ok(stream) = stream {
-    //            // Handle the connection!
-    //            let state = state.clone();
-    //            pool.execute(move || {
-    //                handle_connection(stream, &state);
-    //            })
-    //        }
-    //    }
-
-    // let n_workers = 4;
-    // let pool = ThreadPool::new(n_workers);
     let mut threads: Vec<_> = Vec::new();
 
     while let Some(stream) = listener.next().await {
