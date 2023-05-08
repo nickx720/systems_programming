@@ -48,7 +48,7 @@ struct CmdOptions {
 /// to, what servers have failed, rate limiting counts, etc.)
 ///
 /// You should add fields to this struct in later milestones.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct ProxyState {
     /// How frequently we check whether upstream servers are alive (Milestone 4)
     #[allow(dead_code)]
@@ -128,8 +128,6 @@ async fn main() {
     for item in threads {
         item.join().expect("Thread panicked");
     }
-
-    //https://stackoverflow.com/questions/61292425/how-to-run-an-asynchronous-task-from-a-non-main-thread-in-tokio
 }
 
 async fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::Error> {
@@ -138,6 +136,7 @@ async fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::E
     let upstream_ip = &state.upstream_addresses[upstream_idx];
     TcpStream::connect(upstream_ip).await.or_else(|err| {
         log::error!("Failed to connect to upstream {}: {}", upstream_ip, err);
+        dbg!(state);
         Err(err)
     })
     // TODO: implement failover (milestone 3)
