@@ -63,6 +63,13 @@ struct ProxyState {
     upstream_addresses: Vec<String>,
 }
 
+impl ProxyState {
+    fn update_upstream_addresses(&mut self, index: usize) {
+        // Filter the index which is not a valid index
+        self.upstream_addresses.remove(index);
+    }
+}
+
 #[tokio::main]
 async fn main() {
     // Initialize the logging library. You can print log messages using the `log` macros:
@@ -134,14 +141,12 @@ async fn alternate_flow(
     upstream_idx: usize,
     state: &ProxyState,
 ) -> Result<TcpStream, std::io::Error> {
-    let mut idx = upstream_idx;
-    if upstream_idx <= 0 {
-        idx = upstream_idx + 1;
-    }
-    if upstream_idx >= state.upstream_addresses.len() {
-        idx = upstream_idx - 1;
-    }
-    TcpStream::connect(&state.upstream_addresses[idx]).await
+    // Cannot borrow as mutable
+    state.update_upstream_addresses(upstream_idx);
+    let mut rng = rand::rngs::StdRng::from_entropy();
+    let upstream_idx = rng.gen_range(0, state.upstream_addresses.len());
+    let upstream_ip = &state.upstream_addresses[upstream_idx];
+    TcpStream::connect(upstream_ip).await
 }
 
 async fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::Error> {
