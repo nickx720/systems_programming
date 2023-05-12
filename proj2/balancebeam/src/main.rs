@@ -130,16 +130,30 @@ async fn main() {
     }
 }
 
+async fn alternate_flow(
+    upstream_idx: usize,
+    state: &ProxyState,
+) -> Result<TcpStream, std::io::Error> {
+    let mut idx = upstream_idx;
+    if upstream_idx <= 0 {
+        idx = upstream_idx + 1;
+    }
+    if upstream_idx >= state.upstream_addresses.len() {
+        idx = upstream_idx - 1;
+    }
+    TcpStream::connect(&state.upstream_addresses[idx]).await
+}
+
 async fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::Error> {
     let mut rng = rand::rngs::StdRng::from_entropy();
     let upstream_idx = rng.gen_range(0, state.upstream_addresses.len());
     let upstream_ip = &state.upstream_addresses[upstream_idx];
-    TcpStream::connect(upstream_ip).await.or_else(|err| {
-        log::error!("Failed to connect to upstream {}: {}", upstream_ip, err);
-        dbg!(state);
-        Err(err)
-    })
-    // TODO: implement failover (milestone 3)
+    let result = TcpStream::connect(upstream_ip).await; // TODO: implement failover (milestone 3)
+    if result.is_err() {
+        alternate_flow(upstream_idx, state).await
+    } else {
+        result
+    }
 }
 
 async fn send_response(client_conn: &mut TcpStream, response: &http::Response<Vec<u8>>) {
