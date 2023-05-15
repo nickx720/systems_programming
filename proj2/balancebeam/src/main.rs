@@ -63,12 +63,7 @@ struct ProxyState {
     upstream_addresses: Vec<String>,
 }
 
-impl ProxyState {
-    fn update_upstream_addresses(&mut self, index: usize) {
-        // Filter the index which is not a valid index
-        self.upstream_addresses.remove(index);
-    }
-}
+impl ProxyState {}
 
 #[tokio::main]
 async fn main() {
@@ -142,9 +137,14 @@ async fn alternate_flow(
     state: &ProxyState,
 ) -> Result<TcpStream, std::io::Error> {
     // Cannot borrow as mutable
-    state.update_upstream_addresses(upstream_idx);
     let mut rng = rand::rngs::StdRng::from_entropy();
-    let upstream_idx = rng.gen_range(0, state.upstream_addresses.len());
+    let available_addresses = state
+        .upstream_addresses
+        .iter()
+        .enumerate()
+        .filter(|&(index, _)| index == upstream_idx)
+        .collect::<Vec<(usize, &String)>>();
+    let upstream_idx = rng.gen_range(0, available_addresses.len());
     let upstream_ip = &state.upstream_addresses[upstream_idx];
     TcpStream::connect(upstream_ip).await
 }
