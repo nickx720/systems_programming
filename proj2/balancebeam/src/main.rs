@@ -97,7 +97,11 @@ async fn main() {
         active_health_check_path: options.active_health_check_path,
         max_requests_per_minute: options.max_requests_per_minute,
     };
-
+    log::debug!(
+        "{} AND THE CURRENT INTERVAL {}",
+        &state.active_health_check_path,
+        &state.active_health_check_interval
+    );
     let mut threads: Vec<_> = Vec::new();
 
     while let Some(stream) = listener.next().await {
@@ -151,7 +155,7 @@ async fn connect_to_upstream(state: &ProxyState) -> Result<TcpStream, std::io::E
     let mut rng = rand::rngs::StdRng::from_entropy();
     let upstream_idx = rng.gen_range(0, state.upstream_addresses.len());
     let upstream_ip = &state.upstream_addresses[upstream_idx];
-    let result = TcpStream::connect(upstream_ip).await; // TODO: implement failover (milestone 3)
+    let result = TcpStream::connect(upstream_ip).await;
     if result.is_err() {
         alternate_flow(upstream_idx, state).await
     } else {
@@ -195,6 +199,7 @@ async fn handle_connection(mut client_conn: TcpStream, state: &ProxyState) {
             Ok(request) => request,
             // Handle case where client closed connection and is no longer sending requests
             Err(request::Error::IncompleteRequest(0)) => {
+                log::debug!("--------------------------------- new",);
                 log::debug!("Client finished sending requests. Shutting down connection");
                 return;
             }
